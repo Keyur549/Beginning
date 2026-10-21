@@ -225,6 +225,7 @@ function zoneStatsS(room){
   }
   return Object.values(z).map(o=>({...o,avg:o.total/o.count})).sort((a,b)=>b.avg-a.avg||b.total-a.total);
 }
+function zoneProgOf(room){ const m={}, q=room.curIdx, live=(room.status==='question'||room.status==='locked'); for(const p of Object.values(room.players||{})){ const z=String((p&&p.zone)||'').trim(); if(!z) continue; const k=z.toLowerCase(); const o=m[k]||(m[k]={z,i:Object.keys(m).length,n:0,a:0,l:0}); o.n++; if(live&&q!=null&&Object.values(p.marks||{}).includes(q)) o.a++; } if(room.zlock) for(const k in m){ const zl=room.zlock[k]; if(zl&&zl.locks) m[k].l=zl.locks.reduce((s,x)=>s+(x?1:0),0); } return Object.values(m).slice(0,40); }
 function slimBase(room){
   const { clientMap, players, ...rest } = room;
   const n = Object.keys(players).length;
@@ -233,12 +234,13 @@ function slimBase(room){
     for (const [k,v] of Object.entries(room.winners||{})) if (k!=='zone' && typeof v==='string' && players[v]) keep[v]=players[v];
     return {base:{...rest, cfg:publicCfg(), nPlayers:n, zoneS:zoneStatsS(room)}, keep};
   }
-  return {base:{...rest, cfg:publicCfg(), nPlayers:n, questions: room.questions.map(q=>({q:q.q, img:q.img, aud:q.aud}))}, keep:{}};
+  return {base:{...rest, cfg:publicCfg(), nPlayers:n, questions: room.questions.map(q=>({q:q.q, img:q.img, aud:q.aud})), zoneProg: zoneProgOf(room)}, keep:{}};
 }
+function zoneListOf(room){ const seen=[],m={}; for(const p of Object.values(room.players||{})){ const k=String((p&&p.zone)||'').trim().toLowerCase(); if(k&&!(k in m)){ m[k]=seen.length; seen.push(k);} } return m; }
 function slimFor(room, S, name){
   const players = {...S.keep};
   if (name && room.players[name]) players[name] = room.status==='revealed' ? room.players[name] : pubPlayer(room, room.players[name]);
-  return {...S.base, players};
+  const zi=(S.zi||(S.zi=zoneListOf(room))); const pz=name&&room.players[name]?String(room.players[name].zone||'').trim().toLowerCase():''; return {...S.base, players, zoneIdx:(pz in zi)?zi[pz]:null};
 }
 // Host-only backup: the host's browser keeps the FULL room (with answers) so that if the server
 // sleeps/restarts (Render free tier), the host can restore the game instantly.
