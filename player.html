@@ -218,11 +218,14 @@ let state={
   code:null, name:null, room:null, joinErr:''
 };
 let audioOn=true, uploadedPhoto=null;
-function getClientId(){
-  let id = localStorage.getItem('quizClientId');
-  if(!id){ id = 'c'+Date.now()+Math.random().toString(36).slice(2); localStorage.setItem('quizClientId', id); }
-  return id;
-}
+const _mem={};
+function ssGet(k){ try{ const v=sessionStorage.getItem(k); return v==null?(_mem[k]||null):v; }catch(e){ return _mem[k]||null; } }
+function ssSet(k,v){ _mem[k]=v; try{ sessionStorage.setItem(k,v); }catch(e){} }
+// identity is per browser TAB (never shared between tabs / people on one phone); the secret token proves "this is my card"
+function getClientId(){ let id=ssGet('quizClientId'); if(!id){ id='c'+Date.now()+Math.random().toString(36).slice(2); ssSet('quizClientId',id); } return id; }
+function idp(){ return {clientId:getClientId(), key:state.name, token:state.token}; }
+function saveSess(s){ const v=JSON.stringify(s); ssSet('quizSess',v); try{ localStorage.setItem('quizSessL',v); }catch(e){} }
+function sess(){ try{ return JSON.parse(ssGet('quizSess')||'null'); }catch(e){ return null; } }
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 let currentUtterance=null;
 function toggleAudio(){ audioOn=!audioOn; if(!audioOn && 'speechSynthesis' in window) window.speechSynthesis.cancel(); render(); }
@@ -258,19 +261,38 @@ function uiJoinRoom(){
   if(!name){ state.joinErr='તમારું નામ નાખો.'; keepForm(); return; }
   if(!zone){ state.joinErr='Zone નું નામ નાખો.'; keepForm(); return; }
   state.profile={name,avatar,zone};
-  socket.emit('player:join',{code,name,zone,avatar,clientId:getClientId()},(res)=>{
-    if(!res.ok){ state.joinErr=res.error; keepForm(); return; }
-    state.code=code; state.name=res.yourKey; state.joinErr='';
-    state.room=res.room; socket.emit('subscribe',{code,clientId:getClientId()}); render();
+  socket.emit('player:join',{code,name,zone,avatar,clientId:getClientId(),token:(function(){const q=sess(); return q&&q.code===code?q.token:undefined;})()},(res)=>{
+    if(!res.ok){ state.joinErr=res.error; keepForm(); if(res.retry && (uiJoinRoom._n=(uiJoinRoom._n||0)+1)<=8) setTimeout(()=>{ if(!state.code && document.getElementById('joinName')) uiJoinRoom(); },5000); return; }
+    uiJoinRoom._n=0;
+    state.code=code; state.name=res.yourKey; state.token=res.token; state.joinErr=''; saveSess({code,name,zone,avatar,key:res.yourKey,token:res.token}); if(res.priv){ state.fifty=res.priv.fifty||null; state.copy=res.priv.copy||null; }
+    state.room=res.room; socket.emit('subscribe',Object.assign({code},idp())); render();
     if(!res.resumed && res.yourKey!==name.trim()) alert('બીજા Zone માં આ નામ પહેલેથી છે — તમે "'+res.yourKey+'" તરીકે Join થયા. Winner list માં આ જ નામ શોધજો.');
   });
 }
-socket.on('state', r=>{ if(state.code && r.code===state.code){ state.room=r; qaAuto(r); maybeSpeak(r); render(); musicSync(r); scAutoCheck(r); } });
+socket.on('state', r=>{ if(state.code && r.code===state.code){ if(state.name&&state.room&&state.room.players&&state.room.players[state.name]&&r.players&&!r.players[state.name]&&r.status!=='revealed') r.players[state.name]=state.room.players[state.name]; state.room=r; qaAuto(r); maybeSpeak(r); render(); musicSync(r); scAutoCheck(r); } });
 function scAutoCheck(r){ try{ if(r.status==='revealed' && r.scReveal && (r.revealStep||0)>WINNER_ORDER.length){ const k='scAuto_'+r.code+'_'+(r.createdAt||''); if(localStorage.getItem(k)) return; localStorage.setItem(k,'1'); setTimeout(()=>{ try{scOpen();}catch(e){} },700); } }catch(e){} }
 socket.on('me', m=>{ if(state.code&&state.room&&m&&m.name===state.name&&state.room.status!=='revealed'){ state.room.players[m.name]=m.p; render(); } });
-socket.on('connect', ()=>{ if(state.code) socket.emit('subscribe',{code:state.code,clientId:getClientId()},(res)=>{ if(res&&res.ok&&res.room){ state.room=res.room; render(); } }); });
+socket.on('connect', ()=>{ if(state.code) socket.emit('subscribe',Object.assign({code:state.code},idp()),(res)=>{ if(res&&res.ok&&res.room){ state.room=res.room; render(); } }); });
 // if the server slept/restarted and the host restored the game, re-join the room automatically
-setInterval(()=>{ if(state.code) socket.emit('resync',{code:state.code,clientId:getClientId()},(res)=>{ if(res&&res.ok&&res.room){ state.room=res.room; render(); } }); },4000);
+setInterval(()=>{ if(state.code) socket.emit('resync',Object.assign({code:state.code},idp()),(res)=>{ if(res&&res.ok&&res.room){ state.room=res.room; render(); } }); },4000);
+
+let _rj=0;
+function applyRes(s,res){ state.code=s.code; state.name=res.yourKey; state.token=res.token; state.profile={name:s.name,avatar:s.avatar,zone:s.zone}; state.joinErr='';
+  if(res.priv){ state.fifty=res.priv.fifty||null; state.copy=res.priv.copy||null; }
+  saveSess({code:s.code,name:s.name,zone:s.zone,avatar:s.avatar,key:res.yourKey,token:res.token}); state.room=res.room; socket.emit('subscribe',Object.assign({code:s.code},idp())); render(); }
+function autoRejoin(){   // our card is missing from the server state (reconnect / server restart / restore): get it back with the secret token
+  const now=Date.now(); if(now-_rj<2500||!state.code) return; _rj=now; const s=sess(); if(!s||s.code!==state.code) return;
+  socket.emit('player:join',{code:s.code,name:s.name,zone:s.zone,avatar:s.avatar,clientId:getClientId(),token:state.token||s.token},res=>{ if(res&&res.ok) applyRes(s,res); });
+}
+setInterval(()=>{ if(state.code&&state.room&&state.room.players&&!state.room.players[state.name]) autoRejoin(); },3000);
+let _auto=false;   // refresh of THIS tab: go straight back into the game with this tab's own card
+socket.on('connect',()=>{ if(_auto||state.code) return; _auto=true; const s=sess(); if(!s||(prefillCode&&prefillCode!==s.code)) return;
+  socket.emit('player:join',{code:s.code,name:s.name,zone:s.zone,avatar:s.avatar,clientId:getClientId(),token:s.token},res=>{
+    if(res&&res.ok) applyRes(s,res); else { try{ sessionStorage.removeItem('quizSess'); }catch(e){} _mem.quizSess=null; } }); });
+function contBtn(){ try{ if(state.code) return ''; const s=JSON.parse(localStorage.getItem('quizSessL')||'null'); if(!s||(prefillCode&&s.code!==prefillCode)) return '';
+  return '<button class="btn ghost" onclick="uiContinue()">↩ '+esc(s.name)+' ('+esc(s.zone)+') તરીકે પાછા આવો</button>'; }catch(e){ return ''; } }
+function uiContinue(){ let s=null; try{ s=JSON.parse(localStorage.getItem('quizSessL')||'null'); }catch(e){} if(!s) return;
+  socket.emit('player:join',{code:s.code,name:s.name,zone:s.zone,avatar:s.avatar,clientId:getClientId(),token:s.token},res=>{ if(res&&res.ok) applyRes(s,res); else { state.joinErr=(res&&res.error)||'જોડાઈ શકાયું નહિ'; render(); } }); }
 
 function boxPick(i){ const r=state.room; if(!r||r.status!=='box') return; const p=r.players[state.name]; if(p&&(p.boxPick||[])[r.round]!=null) return; socket.emit('player:boxPick',{code:state.code,name:state.name,idx:i}); }
 function boxHist(p,r){ const res=p.boxRes||[]; const nR=(r.cfg&&r.cfg.rounds)||7; const got=res.map((v,i)=>v==null?null:i).filter(i=>i!=null); if(!got.length) return '';
@@ -811,14 +833,14 @@ function render(){
       <select id="joinAvatar" style="display:none">${EMOJI_LIST.map(e=>`<option value="${e}">${e}</option>`).join('')}</select><div class="avpick">${EMOJI_LIST.map(e=>`<button type="button" class="avp${e===((state.profile&&state.profile.avatar)||'🦁')?' sel':''}" data-e="${e}" onclick="avPick('${e}')">${avHTML(e)}</button>`).join('')}</div>
       <input id="joinZone" placeholder="Zone નું નામ" autocomplete="off">
       <input id="joinCode" placeholder="Room Code" value="${esc(prefillCode)}">
-      <button class="btn secondary" onclick="uiJoinRoom()">Join Game</button>
+      <button class="btn secondary" onclick="uiJoinRoom()">Join Game</button>${contBtn()}
       ${state.joinErr?`<div class="muted" style="color:var(--red)">${esc(state.joinErr)}</div>`:''}
     </div>`;
     return;
   }
   if(!state.room){ el.innerHTML='<div class="card">Loading…</div>'; return; }
   const r=state.room, p=r.players[state.name];
-  if(!p){ el.innerHTML='<div class="card">Card તૈયાર થઈ રહ્યું છે…</div>'; return; }
+  if(!p){ el.innerHTML='<div class="card">Card તૈયાર થઈ રહ્યું છે… (થોડી સેકન્ડ, આપોઆપ ફરી જોડાઈ રહ્યા છીએ)</div>'; autoRejoin(); return; }
   let body=profileHdr(r,p)+zoneBattleHTML(r,p);
   if(r.status!=='lobby' && r.status!=='revealed'){ const nR=(r.cfg&&r.cfg.rounds)||7, dn=r.roundsDone||0; body+=`<div class="prog">✅ ${dn} Round પૂરા થયા · ⏳ ${nR-dn} બાકી</div>`+boxHist(p,r); }
   if(r.status==='lobby'||r.status==='active') body+=`<div class="card">Host ની રાહ જુઓ…<div style="margin-top:8px"><button class="btn ghost" onclick="pracOpen()">🧪 Practice કરો (3 નકલી પ્રશ્ન)</button></div></div>`;

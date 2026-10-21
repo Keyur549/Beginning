@@ -1,3 +1,9 @@
+## 🔧 Update (join fix + Projector control)
+- **Join/Card bug fixed**: dareke Player ne potano secret token male chhe; ek j phone/browser ma 2 Player hoy to pan potanu j Card. Refresh/network drop par card aapoaap pacho male. Same name+Zone thi pacho aavo to 10 sec ma join thai jay (auto-retry).
+- Join screen par "↩ Name તરીકે પાછા આવો" button.
+- **Projector (📺)**: Wheel/Draw projector par j dekhay chhe, SPIN / Pause / Time Skip / Result Reveal / Next Winner buttons projector mathi j; Winner par Grand confetti + Claim time.
+- Epilogue dashboard: Question-wise % ane Life Line/hidden khana kadhi nakhya.
+
 # 🆕 Avatars · Winner Voice · Practice · Net Banner · Hall of Fame
 - **🎨 Cartoon Avatars:** Join vakhte 16 cartoon characters (Sher, Vagh, Panda, Vandro, Fox, Medak, Penguin, Ghuvad, Kachbo, Madhmakhi, Phool, Taro, Agni, Rocket, Taj, Nishan) ma thi pasand karo. Header, Winner screens, Projector ane Hall of Fame ma e j dekhay.
 - **🔊 Winner Voice (Host):** 📺 Projector Mode ma Winner jaher thay tyare Gujarati avaj ma naam ane Zone bole (ghar nu 🔊 button thi bandh). Host na phone/laptop ma Gujarati TTS voice joiye.
