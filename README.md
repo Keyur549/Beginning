@@ -1,3 +1,10 @@
+# 🆕 Avatars · Winner Voice · Practice · Net Banner · Hall of Fame
+- **🎨 Cartoon Avatars:** Join vakhte 16 cartoon characters (Sher, Vagh, Panda, Vandro, Fox, Medak, Penguin, Ghuvad, Kachbo, Madhmakhi, Phool, Taro, Agni, Rocket, Taj, Nishan) ma thi pasand karo. Header, Winner screens, Projector ane Hall of Fame ma e j dekhay.
+- **🔊 Winner Voice (Host):** 📺 Projector Mode ma Winner jaher thay tyare Gujarati avaj ma naam ane Zone bole (ghar nu 🔊 button thi bandh). Host na phone/laptop ma Gujarati TTS voice joiye.
+- **🧪 Practice Round (Player):** Lobby ma "Practice" button — 3 nakli prashn, Card ma jawab, Claim dabavvu. Score nathi, bija ne kai dekhatu nathi.
+- **⚠️ Connection banner:** Net tute to upar laal patti "ફરી જોડાઈ રહ્યા છીએ…", pacha joday to "✅ પાછા જોડાઈ ગયા". (Player ane Host banne.)
+- **🏛 Hall of Fame (Host):** Nichey jamne 🏛 button. Result Reveal pachhi darek game na Winners aapo-aap Host na browser ma save thay. CSV download ane Clear. (Browser data clear karo to jay.)
+
 # 🆕 Projector · Sound · Zone Battle
 - **📺 Projector Mode (Host):** Host screen par nichey jamne 📺 button. Hall na motā screen/TV par kholo (full screen, ✕ ke Esc thi bandh). Lobby ma motu QR + Room Code + Players ni sankhya; prashn vakhte motu prashn, motu Timer ane Zone-wise progress; Result vakhte darek Winner motā akshar ma avatar sathe.
 - **🔊 Sound + Vibration (Player):** Khanu 🔒 thay, chhella 5 second no Timer, navo prashn, Claim ane Winner reveal par avaj ane (Android ma) vibration. Header ma 🔊/🔇 thi bandh/chalu — yaad rahe.
