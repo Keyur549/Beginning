@@ -1,3 +1,19 @@
+## 🏅 Update (Certificate edit + Logo + Player certificate)
+- 🛠 Host Tools > Certificates > "✏️ Certificate Edit / મારો Logo": Title, Sub-title, Message, Event naam, Sahi karnar nu naam, sahi niche lakhan, Colour ane potano Logo upload. "Save + Players ne batavo" thi winners na phone ma e j Certificate dekhay.
+- Winner Player ne Result reveal ma tena category aavya pachhi "🏅 Maru Certificate" button; image par long-press kari Save ke Download.
+- Logo/edit Host na browser ma yaad rahe chhe (nava game ma pan).
+
+## 🏅 Update (Certificates + Event Report)
+- 🛠 Host Tools > "Certificates & Report" (Result Reveal pachhi): darek Winner nu Certificate PNG, badha no ek PDF, ane Event Report PDF (Winners + Zone-wise score).
+
+## 🔥🔊 Update (Zone Fire + Sound Pack)
+- Projector: koi Zone na badha Players (min 3) e jawab apya to "🔥 Zone on fire" banner + bar par 🔥 (fakat jawab apya ni sankhya par, sacha/khota par nahi — suspense jalvay chhe). Chhelli 5 sec ma timer tick, winner par fanfare.
+- 🛠 Host Tools ma Sound Pack: Classic / Arcade / Soft / Festival (wheel tick, fanfare mate).
+
+## 🛠 Update (Host Tools)
+- Host par 🛠 button: Players list ma ✏️ Rename / 🗑 Kick, 🤖 Pre-test (Lobby ma Test Players ume ro, Host/Player update size juo; Game start thatam j auto-remove), 💾 Backup Download / File thi Restore.
+- Rename pachhi player no card jalvai rahe chhe (token same).
+
 ## 🔧 Update (join fix + Projector control)
 - **Join/Card bug fixed**: dareke Player ne potano secret token male chhe; ek j phone/browser ma 2 Player hoy to pan potanu j Card. Refresh/network drop par card aapoaap pacho male. Same name+Zone thi pacho aavo to 10 sec ma join thai jay (auto-retry).
 - Join screen par "↩ Name તરીકે પાછા આવો" button.

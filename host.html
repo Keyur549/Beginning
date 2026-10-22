@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Host — જ્ઞાન શોધ · The Beginning</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Gujarati:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Gujarati:wght@400;600;700;800&family=Noto+Serif+Gujarati:wght@700;800;900&family=Playfair+Display:wght@700;900&family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#ecfaf6;--card:#fff;--ink:#12332f;--muted:#5f7f7a;--accent:#0d9488;--accent2:#f97316;--line:#cdeae4;}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#141220;--card:#1f1d2e;--ink:#f1f0f6;--muted:#a1a1b5;--line:#33314a;}}
@@ -138,6 +138,35 @@ input:focus,select:focus{outline:none;border-color:var(--pl);box-shadow:0 0 0 3p
 @keyframes pjglow{from{filter:drop-shadow(0 0 8px rgba(253,224,71,.3))}to{filter:drop-shadow(0 0 34px rgba(253,224,71,.95))}}
 .pjfw{font-size:clamp(2rem,7vw,5rem);letter-spacing:.3em;animation:pjpop .8s .2s both}
 @media (prefers-reduced-motion:reduce){.pjconf i,.pjgrand{animation:none}}
+
+/* ---- projector v2: fit-to-screen + premium type ---- */
+#pj .pjstg{flex-direction:row;flex-wrap:wrap;justify-content:center;align-items:center;gap:2vw 4vw}
+#pj .pjwh{display:flex;flex-direction:column;align-items:center}
+#pj svg#wheelSvg{width:min(56vh,80vw)}#pj .pjstg div[style*="width:284px"]{width:min(56vh,80vw)!important}
+#pj .pjnum{display:flex;flex-direction:column;align-items:center}
+#pj .pjbig{font-size:clamp(2.4rem,min(9vw,14vh),7rem)}
+#pj .pjqr{width:min(36vw,38vh,360px);height:min(36vw,38vh,360px)}
+#pj .pjq{font-size:clamp(1.3rem,min(4vw,6vh),3.2rem);font-family:'Noto Serif Gujarati','Noto Sans Gujarati',serif;font-weight:800}
+#pj .pjt{font-size:clamp(3rem,min(15vw,19vh),9rem)}
+#pj .pjimg{max-height:22vh}
+#pj .pjin{padding-bottom:110px}
+.pjchip{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);border-radius:99px;padding:4px 18px;font-weight:800;font-size:clamp(.9rem,2.4vh,1.5rem);color:#fde68a}
+#pj .pjname{font-family:'Playfair Display','Noto Serif Gujarati',serif;font-weight:900;letter-spacing:.5px;background:linear-gradient(180deg,#fff7d6 0%,#fde68a 45%,#f59e0b 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;filter:drop-shadow(0 4px 10px rgba(0,0,0,.45))}
+#pj .pjl{font-family:'Cinzel','Noto Serif Gujarati',serif;font-weight:700;letter-spacing:.18em;color:#fde68a;text-shadow:0 0 18px rgba(253,224,71,.55)}
+#pj .pjzn{font-family:'Cinzel','Noto Sans Gujarati',serif;letter-spacing:.12em;font-weight:700;border:1px solid rgba(253,230,138,.6)}
+#pj .pjclaim{font-family:'Playfair Display','Noto Serif Gujarati',serif;font-weight:700}
+
+#htool{position:fixed;right:max(12px,env(safe-area-inset-right,0px));bottom:calc(max(12px,env(safe-area-inset-bottom,0px)) + 168px);z-index:70;width:46px;height:46px;border-radius:50%;border:2px solid #fff;background:linear-gradient(135deg,#64748b,var(--pd));color:#fff;font-size:1.2rem;box-shadow:0 6px 18px rgba(0,0,0,.35);cursor:pointer}
+#htl{position:fixed;inset:0;z-index:170;background:rgba(10,8,25,.62);overflow:auto;padding:12px;display:none}#htl .hin{max-width:680px;margin:0 auto}
+#htl .tsec{border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin:10px 0}#htl .tsec h3{margin:0 0 6px;font-size:1rem;color:var(--pd)}
+#htl .trow{display:flex;gap:8px;align-items:center;padding:5px 0;border-top:1px dashed var(--line);font-size:.9rem}#htl .trow b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#htl .trow span{color:var(--muted);font-size:.78rem}
+#htl .trow button{border:0;background:var(--bg);border-radius:10px;padding:6px 10px;cursor:pointer;font-size:1rem}
+#htl input[type=text],#htl input[type=number],#htl input[type=search]{width:100%;padding:9px;border:1px solid var(--line);border-radius:10px;font:inherit;background:var(--card);color:var(--ink)}
+#htl .tbt{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}#htl .tbt button{flex:1;min-width:140px;border:0;border-radius:12px;padding:10px;font:inherit;font-weight:800;color:#fff;background:linear-gradient(135deg,var(--pl),var(--pd));cursor:pointer}#htl .tbt button.r{background:#dc2626}
+#htl .tmsg{margin-top:6px;font-size:.85rem;color:var(--muted)}
+
+.pjfire{background:linear-gradient(90deg,#f97316,#dc2626);border-radius:99px;padding:6px 24px;font-weight:900;font-size:clamp(1rem,2.6vh,1.8rem);color:#fff;box-shadow:0 0 28px rgba(249,115,22,.8);animation:pjfp .9s ease-in-out infinite alternate}@keyframes pjfp{to{transform:scale(1.06)}}
+.tcr{display:flex;gap:6px;align-items:center;padding:4px 0;border-top:1px dashed var(--line);font-size:.85rem}.tcr b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.tcr button{border:0;background:var(--bg);border-radius:10px;padding:5px 9px;cursor:pointer}
 </style>
 </head>
 <body>
@@ -1545,12 +1574,14 @@ function computeTargetRotation(pos,total){
   return wheelRotation+delta+5*360;
 }
 let tickAudioCtx=null;
+const SPACKS={classic:{n:'🎼 Classic',tick:['square',1100,.16],fan:['triangle',[523.25,659.25,783.99,1046.5],.1]},arcade:{n:'🕹 Arcade',tick:['sawtooth',1700,.1],fan:['square',[392,523.25,659.25,783.99,1046.5,1318.5],.07]},soft:{n:'🔔 Soft',tick:['sine',720,.24],fan:['sine',[440,554.37,659.25,880],.14]},festival:{n:'🎉 Festival',tick:['triangle',950,.22],fan:['triangle',[523.25,587.33,659.25,783.99,880,1046.5,1318.5],.09]}};
+function spk(){ try{ return SPACKS[localStorage.getItem('hostSP')]||SPACKS.classic; }catch(e){ return SPACKS.classic; } }
 function playTick(){
   try{
     if(!tickAudioCtx) tickAudioCtx=new (window.AudioContext||window.webkitAudioContext)();
-    const o=tickAudioCtx.createOscillator(), g=tickAudioCtx.createGain();
-    o.type='square'; o.frequency.value=1100;
-    g.gain.setValueAtTime(.16,tickAudioCtx.currentTime);
+    const P=spk().tick, o=tickAudioCtx.createOscillator(), g=tickAudioCtx.createGain();
+    o.type=P[0]; o.frequency.value=P[1];
+    g.gain.setValueAtTime(P[2],tickAudioCtx.currentTime);
     g.gain.exponentialRampToValueAtTime(.001,tickAudioCtx.currentTime+.055);
     o.connect(g); g.connect(tickAudioCtx.destination);
     o.start(); o.stop(tickAudioCtx.currentTime+.06);
@@ -1569,13 +1600,13 @@ function playSpinTicks(durationMs){
 function playFanfare(){
   try{
     if(!tickAudioCtx) tickAudioCtx=new (window.AudioContext||window.webkitAudioContext)();
-    const now=tickAudioCtx.currentTime;
-    [523.25,659.25,783.99,1046.5].forEach((freq,i)=>{
+    const now=tickAudioCtx.currentTime, P=spk().fan;
+    P[1].forEach((freq,i)=>{
       const o=tickAudioCtx.createOscillator(), g=tickAudioCtx.createGain();
-      o.type='triangle'; o.frequency.value=freq;
-      const t0=now+i*0.1;
+      o.type=P[0]; o.frequency.value=freq;
+      const t0=now+i*P[2];
       g.gain.setValueAtTime(0,t0);
-      g.gain.linearRampToValueAtTime(.22,t0+.02);
+      g.gain.linearRampToValueAtTime(.2,t0+.02);
       g.gain.exponentialRampToValueAtTime(.001,t0+.5);
       o.connect(g); g.connect(tickAudioCtx.destination);
       o.start(t0); o.stop(t0+.5);
@@ -2306,7 +2337,7 @@ function pvAnnounce(r){var O=(typeof WINNER_ORDER!=='undefined')?WINNER_ORDER:[]
  function hue(i){return Math.round((i*137.508+250)%360)}
  function col(i){return 'hsl('+hue(i)+',72%,'+((hue(i)>=40&&hue(i)<=190)?40:52)+'%)'}
  function zones(r){var m={},q=r.curIdx,live=(r.status==='question'||r.status==='locked');Object.keys(r.players||{}).forEach(function(n){var p=r.players[n],z=String(p.zone||'').trim();if(!z)return;var k=z.toLowerCase(),o=m[k]||(m[k]={z:z,i:Object.keys(m).length,n:0,a:0});o.n++;if(live&&q!=null&&Object.keys(p.marks||{}).some(function(c){return p.marks[c]===q}))o.a++});return Object.keys(m).map(function(k){return m[k]})}
- function bars(r){var z=zones(r);if(!z.length)return '';z.sort(function(a,b){return (b.a/b.n)-(a.a/a.n)||b.a-a.a});return '<div class="pjz">'+z.slice(0,8).map(function(x){var pc=x.n?Math.round(100*x.a/x.n):0;return '<div class="pjr"><b>'+esc2(x.z)+'</b><span><i style="width:'+pc+'%;background:'+col(x.i)+'"></i></span><em>'+x.a+'/'+x.n+'</em></div>'}).join('')+'</div>'}
+ function bars(r){var z=zones(r);if(!z.length)return '';z.sort(function(a,b){return (b.a/b.n)-(a.a/a.n)||b.a-a.a});return '<div class="pjz">'+z.slice(0,8).map(function(x){var pc=x.n?Math.round(100*x.a/x.n):0;return '<div class="pjr"><b>'+(x.n>=3&&x.a>=x.n?'🔥 ':'')+esc2(x.z)+'</b><span><i style="width:'+pc+'%;background:'+col(x.i)+'"></i></span><em>'+x.a+'/'+x.n+'</em></div>'}).join('')+'</div>'}
 
  function conf(seed){var s=seed*9301+49297,o='',i,cols=['#fde047','#f43f5e','#22d3ee','#a3e6a0','#fb923c','#c084fc','#fff'];function rnd(){s=(s*9301+49297)%233280;return s/233280}
   for(i=0;i<80;i++){o+='<i style="left:'+(rnd()*100).toFixed(1)+'%;background:'+cols[i%cols.length]+';animation-duration:'+(3+rnd()*4).toFixed(1)+'s;animation-delay:-'+(rnd()*6).toFixed(1)+'s;--r:'+Math.round(300+rnd()*700)+'deg"></i>'}
@@ -2322,7 +2353,7 @@ function pvAnnounce(r){var O=(typeof WINNER_ORDER!=='undefined')?WINNER_ORDER:[]
  function stage(r){var h='';try{if(!wheelLayout&&typeof computeLayout==='function')wheelLayout=computeLayout(r);
    h=(typeof drawStage==='function')?drawStage(r):wheelSVG(wheelLayout,wheelRotation,pendingReveal)}catch(e){h=''}
   var n=(typeof pendingReveal!=='undefined'&&pendingReveal!=null&&!spinning)?pendingReveal:null;
-  return '<div class="pjstg">'+h+(n!=null?'<div class="pjs">પ્રશ્ન નંબર</div><div class="pjbig pjw">'+n+'</div>':'')+'</div>'}
+  return '<div class="pjstg"><div class="pjwh">'+h+'</div>'+(n!=null?'<div class="pjnum"><div class="pjs">પ્રશ્ન નંબર</div><div class="pjbig pjw">'+n+'</div></div>':'')+'</div>'}
  function claim(r,k){var w=r.winners||{},ms=w[k+'_ms'],ts=w[k+'_ts'],tie=w[k+'_tie'],o='';
   if(ms!=null&&typeof fmtDur==='function')o+='⏱ '+esc2(fmtDur(ms))+' માં Claim';
   if(w[k+'_score']!=null)o+=(o?' · ':'')+'🎯 Score '+esc2(w[k+'_score']);
@@ -2332,11 +2363,20 @@ function pvAnnounce(r){var O=(typeof WINNER_ORDER!=='undefined')?WINNER_ORDER:[]
   if(st==='active'||st==='spinning'||st==='revealing'){
    return '<div class="pjh">જ્ઞાન શોધ</div>'+stage(r)+(st==='active'&&!(r.usedIdx||[]).length?'<div class="pjs">Game શરૂ થાય છે…</div>':'')+(st==='revealing'?'<div class="pjs">હવે પ્રશ્ન આવે છે…</div>':'')+bars(r)+ctl(r)}
   var h=html0(r);
+  if(st==='question'&&!r.paused){h=h.replace('<div class="pjh">',fireChk(r)+'<div class="pjh">')}
+  if((st==='question'||st==='locked')&&r.curIdx!=null)h=h.replace('<div class="pjh">','<div class="pjchip">🎡 નંબર '+(r.curIdx+1)+'</div><div class="pjh">');
   if(st==='revealed'){var O=(typeof WINNER_ORDER!=='undefined')?WINNER_ORDER:[],step=r.revealStep||0;
    if(step>=1&&step<=O.length){var k=O[step-1],nm=(r.winners||{})[k];
     h=h.replace('class="pjw"','class="pjw pjgrand"')+(nm?claim(r,k)+'<div class="pjfw">🎉🎊🥳🎊🎉</div>'+conf(step*7+3):'')}
    else if(step>O.length)h+=conf(99)}
   return h+ctl(r)}
+
+ var fireIdx=null,fireZone=null,lastStep=-1,lastRem=-1;
+ function fireChk(r){if(r.curIdx!==fireIdx){fireIdx=r.curIdx;fireZone=null}
+  if(!fireZone){var z=zones(r).filter(function(x){return x.n>=3&&x.a>=x.n});if(z.length){fireZone=z[0].z;try{playFanfare()}catch(e){}}}
+  return fireZone?'<div class="pjfire">🔥 '+esc2(fireZone)+' — સૌથી પહેલા બધાએ જવાબ આપ્યો!</div>':''}
+ function sfxTick(r){try{if(r.status==='question'&&!r.paused){var rem=Math.max(0,Math.ceil(((r.timerEnd||0)-Date.now())/1000));if(rem!==lastRem){lastRem=rem;if(rem>0&&rem<=5)playTick()}}else lastRem=-1;
+  if(r.status==='revealed'){var st=r.revealStep||0;if(st!==lastStep){lastStep=st;if(st>=1)playFanfare()}}else lastStep=-1}catch(e){}}
  function html0(r){
   var st=r.status,gm=document.title.replace(/^.*?[—\-–]\s*/,'').replace(/Host\s*/,'');
   var head='<div class="pjh">જ્ઞાન શોધ</div>';
@@ -2353,12 +2393,128 @@ function pvAnnounce(r){var O=(typeof WINNER_ORDER!=='undefined')?WINNER_ORDER:[]
   if(st==='ended')return head+'<div class="pjbig">🙏</div><div class="pjs">રમત પૂરી — Result ટૂંક સમયમાં</div>';
   if(st==='active'||st==='spinning'||st==='revealing'){var n2=(r.usedIdx||[]).length;return head+'<div class="pjbig">🎡</div><div class="pjs">'+(n2?'પ્રશ્ન '+n2+' પછી…':'Game શરૂ થાય છે…')+'</div>'+bars(r)}
   return head+'<div class="pjbig">🎁</div><div class="pjs">'+(r.round!=null?'Round '+((r.round||0)+1)+' · ':'')+'થોભો…</div>'}
- function paint(){if(!open)return;if(typeof spinning!=="undefined"&&spinning)return;var r=(typeof state!=='undefined')&&state.room;var o=document.getElementById('pj');if(!o||!r)return;pvAnnounce(r);var h=html(r);if(h!==last){last=h;o.querySelector('.pjin').innerHTML=h}}
+ function paint(){if(!open)return;if(typeof spinning!=="undefined"&&spinning)return;var r=(typeof state!=='undefined')&&state.room;var o=document.getElementById('pj');if(!o||!r)return;pvAnnounce(r);sfxTick(r);var h=html(r);if(h!==last){last=h;o.querySelector('.pjin').innerHTML=h}}
  function toggle(on){open=(on===undefined)?!open:on;var o=document.getElementById('pj');o.style.display=open?'flex':'none';if(open){last='';paint();try{if(o.requestFullscreen)o.requestFullscreen()}catch(e){}iv=setInterval(paint,500)}else{clearInterval(iv);try{o.querySelector('.pjin').innerHTML='';last=''}catch(e){}try{if(document.fullscreenElement)document.exitFullscreen()}catch(e){}}}
  function init(){var o=document.createElement('div');o.id='pj';o.style.display='none';o.innerHTML='<button class="pjx" aria-label="Close">✕</button><button class="pjv" aria-label="Voice">🔊</button><div class="pjin"></div>';o.querySelector('.pjv').onclick=function(){PV.on=!PV.on;this.textContent=PV.on?'🔊':'🔇';try{speechSynthesis.cancel()}catch(e){}};document.body.insertBefore(o,document.body.firstChild);o.querySelector('.pjin').onclick=function(e){var t=e.target.closest&&e.target.closest('[data-act]');if(!t)return;var a=t.getAttribute('data-act'),f={start:'hostStart',spin:'hostSpin',pause:'hostPause',resume:'hostResume',skip:'hostSkipTimer',reveal:'hostReveal',next:'hostNextWinner',end:'hostEnd'}[a];try{if(f&&typeof window[f]==='function')window[f]();else if(f)eval(f+'()')}catch(x){}};o.querySelector('.pjx').onclick=function(){toggle(false)};
   var b=document.createElement('button');b.id='hproj';b.type='button';b.setAttribute('aria-label','Projector');b.textContent='📺';b.onclick=function(){toggle(true)};document.body.appendChild(b);
   document.addEventListener('keydown',function(e){if(e.key==='Escape'&&open)toggle(false)});document.addEventListener('fullscreenchange',function(){if(open&&!document.fullscreenElement){}})}
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+
+(function(){
+ var o=null,iv=null;
+ function e(t){return String(t==null?'':t).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+ function room(){return (typeof state!=='undefined'&&state.room)||null}
+ function list(){var r=room();if(!r)return '<div class="muted">Room નથી.</div>';var q=(document.getElementById('tq')||{}).value||'';q=q.toLowerCase();
+  var ks=Object.keys(r.players||{}).filter(function(k){var p=r.players[k];return !q||(k+' '+(p.zone||'')).toLowerCase().indexOf(q)>=0}).slice(0,150);
+  return ks.map(function(k){var p=r.players[k];return '<div class="trow"><b>'+e(k)+(p.bot?' 🤖':'')+'</b><span>'+e(p.zone||'')+'</span><button data-r="'+e(k)+'" title="Rename">✏️</button><button data-k="'+e(k)+'" title="Kick">🗑</button></div>'}).join('')||'<div class="muted">કોઈ Player નથી.</div>'}
+ function paintList(){var l=document.getElementById('tl');if(l&&document.activeElement!==document.getElementById('tn'))l.innerHTML=list();var c=document.getElementById('tc');if(c){var r=room();c.textContent=r?Object.keys(r.players||{}).length:0}}
+ function dl(name,txt){var b=new Blob([txt],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){a.remove();URL.revokeObjectURL(a.href)},500)}
+ function build(){o.innerHTML='<div class="hin"><div class="hcard"><div class="hhd"><b>🛠 Host Tools</b><button class="hx" id="tx">✕</button></div>'+
+  '<div class="tsec"><h3>👥 Players (<span id="tc">0</span>) — Rename / Kick</h3><input type="search" id="tq" placeholder="નામ / Zone શોધો…"><div id="tl"></div></div>'+
+  '<div class="tsec"><h3>🤖 Pre-test (Test Players)</h3><div class="muted" style="font-size:.8rem">Lobby માં નકલી Players ઉમેરી જુઓ કે Server/Host કેટલું ભારે થાય છે. Game શરૂ કરતાં જ બધા Test Players આપોઆપ નીકળી જાય છે.</div><input type="number" id="tn" min="1" max="1000" value="50"><div class="tbt"><button id="tadd">➕ Test Players ઉમેરો</button><button class="r" id="tclr">🧹 Test Players કાઢો</button></div><div class="tmsg" id="tmsg"></div></div>'+
+  '<div class="tsec"><h3>🏅 Certificates & Report</h3><div class="muted" style="font-size:.8rem">Result Reveal પછી: દરેક Winner નું Certificate (PNG) અથવા બધાનું એક PDF, અને Event Report PDF.</div><details style="margin:8px 0"><summary style="cursor:pointer;font-weight:800">✏️ Certificate Edit / મારો Logo</summary><div style="display:grid;gap:6px;margin-top:6px"><input type="text" id="ce_title" placeholder="Title (પ્રમાણપત્ર)"><input type="text" id="ce_sub" placeholder="Sub-title (CERTIFICATE OF ACHIEVEMENT)"><input type="text" id="ce_msg" placeholder="Message line"><input type="text" id="ce_event" placeholder="Event / સંસ્થા નું નામ"><input type="text" id="ce_signer" placeholder="સહી કરનાર નું નામ (વૈકલ્પિક)"><input type="text" id="ce_org" placeholder="સહી નીચે લખાણ (Host / Organizer)"><label style="font-size:.85rem">Colour <input type="color" id="ce_color" value="#b8860b"></label><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><img id="ce_logo" alt="" style="max-height:56px;max-width:140px;display:none;border:1px solid var(--line);border-radius:8px;background:#fff"><button type="button" id="ce_up" style="border:0;border-radius:10px;padding:8px 12px;font:inherit;font-weight:800;cursor:pointer">🖼 Logo Upload</button><button type="button" id="ce_rm" style="border:0;border-radius:10px;padding:8px 12px;font:inherit;cursor:pointer">✖ Logo કાઢો</button></div><input type="file" id="ce_f" accept="image/png,image/jpeg,image/webp" style="display:none"><div class="tbt"><button id="ce_save">💾 Save + Players ને બતાવો</button><button id="ce_pv" class="r" style="background:#475569">👁 Preview</button></div><img id="ce_img" alt="" style="width:100%;border-radius:10px;display:none;border:1px solid var(--line)"></div></details><div id="tcr"></div><div class="tbt"><button id="tcall">📄 બધા Certificates (PDF)</button><button id="trep">📊 Event Report (PDF)</button></div><div class="tmsg" id="tcm"></div></div>'+
+  '<div class="tsec"><h3>🔊 Sound Pack (Wheel / Timer / Winner)</h3><select id="tsp" style="width:100%;padding:9px;border-radius:10px;border:1px solid var(--line);font:inherit"></select><div class="tbt"><button id="tspt">▶ Test Sound</button></div></div>'+
+  '<div class="tsec"><h3>💾 Backup</h3><div class="muted" style="font-size:.8rem">Game નું છેલ્લું Backup (દર થોડી સેકન્ડે આપોઆપ browser માં સચવાય છે) ફાઇલ તરીકે Download કરો. Laptop/Browser બદલવો પડે તો ફાઇલ થી Restore થાય.</div><div class="tbt"><button id="tdl">⬇️ Backup Download</button><button id="tup">📂 File થી Restore</button></div><input type="file" id="tf" accept=".json,application/json" style="display:none"><div class="tmsg" id="tbm"></div></div></div></div>';
+  o.querySelector('#tx').onclick=function(){toggle(false)};
+  var q=o.querySelector('#tq');q.oninput=paintList;
+  o.querySelector('#tl').onclick=function(ev){var t=ev.target.closest('button');if(!t)return;var c=state.code;
+   if(t.dataset.k){if(confirm('"'+t.dataset.k+'" ને Game માંથી કાઢી નાખવા?'))socket.emit('host:kick',{code:c,name:t.dataset.k},function(){paintList()})}
+   else if(t.dataset.r){var nn=prompt('નવું નામ:',t.dataset.r);if(nn)socket.emit('host:rename',{code:c,name:t.dataset.r,newName:nn},function(res){if(res&&!res.ok)alert(res.error||'થયું નહિ');paintList()})}};
+  o.querySelector('#tadd').onclick=function(){var m=o.querySelector('#tmsg');m.textContent='ઉમેરાય છે…';socket.emit('host:addBots',{code:state.code,n:+o.querySelector('#tn').value},function(r){m.textContent=r&&r.ok?('✅ '+r.added+' Test Players ઉમેર્યા · કુલ '+r.total+' · Host update ≈ '+r.hostKB+' KB · Player update ≈ '+r.playerKB+' KB · Server ગણતરી '+r.ms+' ms. (Host update 2000 KB થી મોટું હોય તો Render free plan માં ધીમું પડી શકે.)'):('⚠️ '+((r&&r.error)||'થયું નહિ'))})};
+  o.querySelector('#tclr').onclick=function(){socket.emit('host:clearBots',{code:state.code},function(r){o.querySelector('#tmsg').textContent=r&&r.ok?('🧹 '+r.removed+' Test Players કાઢ્યા'):'થયું નહિ'})};
+  (function(){var C={};try{C=JSON.parse(localStorage.getItem('certCfg')||'{}')}catch(x){}
+   var F={ce_title:'title',ce_sub:'sub',ce_msg:'msg',ce_event:'event',ce_signer:'signer',ce_org:'org'};Object.keys(F).forEach(function(id){o.querySelector('#'+id).value=C[F[id]]||''});
+   if(C.color)o.querySelector('#ce_color').value=C.color;var lg=o.querySelector('#ce_logo');function showLogo(){if(C.logo){lg.src=C.logo;lg.style.display='block'}else lg.style.display='none'}showLogo();
+   function read(){var n={};Object.keys(F).forEach(function(id){n[F[id]]=o.querySelector('#'+id).value.trim()});n.color=o.querySelector('#ce_color').value;if(C.logo)n.logo=C.logo;return n}
+   o.querySelector('#ce_up').onclick=function(){o.querySelector('#ce_f').click()};o.querySelector('#ce_rm').onclick=function(){delete C.logo;showLogo()};
+   o.querySelector('#ce_f').onchange=function(){var f=this.files&&this.files[0];if(!f)return;var fr=new FileReader();fr.onload=function(){var im=new Image();im.onload=function(){var k=Math.min(1,420/im.width,200/im.height),cv=document.createElement('canvas');cv.width=Math.round(im.width*k);cv.height=Math.round(im.height*k);cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);C.logo=cv.toDataURL('image/png');if(C.logo.length>400000)C.logo=cv.toDataURL('image/jpeg',.85);showLogo()};im.src=fr.result};fr.readAsDataURL(f)};
+   o.querySelector('#ce_save').onclick=function(){C=Object.assign(C,read());if(!o.querySelector('#ce_logo').src||lg.style.display==='none')delete C.logo;try{localStorage.setItem('certCfg',JSON.stringify(C))}catch(x){alert('Logo બહુ મોટો છે')}var m=o.querySelector('#tcm');CERT.prep().then(function(){m.textContent='✅ Save થયું — Winners ના phone માં આ જ Certificate દેખાશે'})};
+   o.querySelector('#ce_pv').onclick=function(){C=Object.assign(C,read());try{localStorage.setItem('certCfg',JSON.stringify(C))}catch(x){}CERT.fonts().then(CERT.prep).then(function(){var d=(CERT.list()[0])||{name:'વિજેતા નું નામ',zone:'Zone',label:'1 Line',detail:'⏱ 1 મિનિટ 23 સેકન્ડ માં',code:(room()&&room().code)||'ROOM'};var im=o.querySelector('#ce_img');im.src=CERT.draw(d).toDataURL('image/jpeg',.8);im.style.display='block'})}})();
+  (function(){var box=o.querySelector('#tcr'),m=o.querySelector('#tcm');var rv=room()&&room().status==='revealed';
+   if(!rv){box.innerHTML='<div class="muted" style="margin:6px 0">⏳ Result Reveal થયા પછી ઉપલબ્ધ થશે.</div>';o.querySelector('#tcall').disabled=true;o.querySelector('#trep').disabled=true;return}
+   box.innerHTML=CERT.list().map(function(d){return '<div class="tcr"><b>'+e(d.label)+' · '+e(d.name)+'</b><button data-c="'+e(d.k)+'">🖼 PNG</button></div>'}).join('');
+   box.onclick=function(ev){var t=ev.target.closest('button[data-c]');if(t){m.textContent='બની રહ્યું છે…';CERT.one(t.dataset.c).then(function(){m.textContent='✅ Download થયું'})}};
+   o.querySelector('#tcall').onclick=function(){m.textContent='PDF બની રહ્યો છે…';CERT.allPdf().then(function(n){m.textContent=n?('✅ '+n+' Certificates નો PDF Download થયો'):'Winner નથી'})};
+   o.querySelector('#trep').onclick=function(){m.textContent='Report બની રહ્યો છે…';CERT.report().then(function(n){m.textContent='✅ Report PDF ('+n+' page) Download થયો'})}})();
+  (function(){var sel=o.querySelector('#tsp'),cur='classic';try{cur=localStorage.getItem('hostSP')||'classic'}catch(x){}sel.innerHTML=Object.keys(SPACKS).map(function(k){return '<option value="'+k+'"'+(k===cur?' selected':'')+'>'+SPACKS[k].n+'</option>'}).join('');sel.onchange=function(){try{localStorage.setItem('hostSP',sel.value)}catch(x){}try{playFanfare()}catch(x){}};o.querySelector('#tspt').onclick=function(){try{playTick();setTimeout(playTick,120);setTimeout(playFanfare,300)}catch(x){}}})();
+  o.querySelector('#tdl').onclick=function(){var b=null;try{b=getBackup()}catch(x){}var m=o.querySelector('#tbm');if(!b){m.textContent='હજી Backup બન્યું નથી (Game શરૂ થયા પછી થોડી સેકન્ડમાં બનશે).';return}
+   dl('gyan-backup-'+b.room.code+'-'+new Date(b.savedAt||Date.now()).toISOString().replace(/[:.]/g,'-')+'.json',JSON.stringify(b));m.textContent='✅ Download થયું (Backup સમય '+new Date(b.savedAt||Date.now()).toLocaleTimeString()+')'};
+  o.querySelector('#tup').onclick=function(){o.querySelector('#tf').click()};
+  o.querySelector('#tf').onchange=function(){var f=this.files&&this.files[0];if(!f)return;var m=o.querySelector('#tbm');var rd=new FileReader();rd.onload=function(){try{var j=JSON.parse(rd.result),rm=j.room||j;if(!rm||!rm.code||!rm.players)throw new Error('ફાઇલ ખોટી છે');
+    if(!confirm('Room '+rm.code+' ('+Object.keys(rm.players).length+' Players) Restore કરવું?'))return;try{localStorage.setItem('quizBackup',JSON.stringify({savedAt:j.savedAt||Date.now(),room:rm}))}catch(x){}
+    socket.emit('host:restore',{room:rm},function(res){if(res&&res.ok){state.code=res.code;subscribe();m.textContent='✅ Restore થયું';}else m.textContent='⚠️ '+((res&&res.error)||'Restore ન થયું')})}catch(x){m.textContent='⚠️ '+x.message}};rd.readAsText(f)}}
+ function toggle(on){var s=on===undefined?o.style.display!=='block':on;o.style.display=s?'block':'none';if(s){build();paintList();iv=setInterval(paintList,2000)}else clearInterval(iv)}
+ function init(){o=document.createElement('div');o.id='htl';document.body.appendChild(o);var b=document.createElement('button');b.id='htool';b.type='button';b.setAttribute('aria-label','Host Tools');b.textContent='🛠';b.onclick=function(){if(!room()){alert('પહેલાં Room બનાવો.');return}toggle(true)};document.body.appendChild(b)}
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+
+(function(){
+ var SERIF="'Playfair Display','Noto Serif Gujarati','Noto Sans Gujarati',Georgia,serif",DISP="'Cinzel','Noto Serif Gujarati',Georgia,serif",SANS="'Noto Sans Gujarati','Shruti','Nirmala UI','Segoe UI',system-ui,sans-serif";
+ function fontsReady(){try{return Promise.all(['900 60px "Playfair Display"','700 40px "Cinzel"','800 40px "Noto Serif Gujarati"','700 30px "Noto Sans Gujarati"'].map(function(f){return document.fonts.load(f,'Aઅ1')})).catch(function(){})}catch(e){return Promise.resolve()}}
+ function fit(g,t,max,size,wt,fam,min){var s=size;g.font=wt+' '+s+'px '+fam;while(g.measureText(t).width>max&&s>(min||24)){s-=2;g.font=wt+' '+s+'px '+fam}return s}
+ function gameName(){return document.title.replace(/^.*?[—\-–]\s*/,'').replace(/Host\s*/,'').trim()}
+
+ var CSERIF="'Playfair Display','Noto Serif Gujarati','Noto Sans Gujarati',Georgia,serif",CDISP="'Cinzel','Noto Serif Gujarati',Georgia,serif",CSANS="'Noto Sans Gujarati','Shruti','Nirmala UI','Segoe UI',system-ui,sans-serif";
+ function cfit(g,t,max,size,wt,fam,min){var s=size;g.font=wt+' '+s+'px '+fam;while(g.measureText(t).width>max&&s>(min||24)){s-=2;g.font=wt+' '+s+'px '+fam}return s}
+ function certDraw(d,C,img){C=C||{};var W=1754,H=1240,c=document.createElement('canvas');c.width=W;c.height=H;var g=c.getContext('2d'),A=/^#[0-9a-f]{6}$/i.test(C.color||'')?C.color:'#b8860b';
+  var bg=g.createRadialGradient(W/2,H*.4,100,W/2,H/2,W*.7);bg.addColorStop(0,'#fffdf5');bg.addColorStop(1,'#f6ead0');g.fillStyle=bg;g.fillRect(0,0,W,H);
+  g.strokeStyle=A;g.lineWidth=12;g.strokeRect(28,28,W-56,H-56);g.lineWidth=3;g.strokeRect(54,54,W-108,H-108);
+  g.fillStyle=A;[[28,28],[W-28,28],[28,H-28],[W-28,H-28]].forEach(function(p){g.save();g.translate(p[0],p[1]);g.rotate(Math.PI/4);g.fillStyle=A;g.fillRect(-16,-16,32,32);g.fillStyle='#fffaf0';g.fillRect(-7,-7,14,14);g.restore()});
+  g.textAlign='center';
+  if(img&&img.width){var k=Math.min(420/img.width,130/img.height,2),iw=img.width*k,ih=img.height*k;g.drawImage(img,W/2-iw/2,75+(130-ih)/2,iw,ih)}else{g.font='90px '+CSANS;g.fillStyle='#000';g.fillText('🏆',W/2,175)}
+  g.fillStyle=A;g.font='700 34px '+CDISP;g.fillText((C.sub||'CERTIFICATE OF ACHIEVEMENT').toUpperCase(),W/2,265);
+  g.fillStyle='#3b2a00';var ts=cfit(g,C.title||'પ્રમાણપત્ર',W-400,78,900,CSERIF,40);g.font='900 '+ts+'px '+CSERIF;g.fillText(C.title||'પ્રમાણપત્ર',W/2,355);
+  g.fillStyle='#6b5a2e';var ms=cfit(g,C.msg||'આ પ્રમાણપત્ર અભિનંદન સાથે આપવામાં આવે છે',W-300,34,600,CSANS,20);g.font='600 '+ms+'px '+CSANS;g.fillText(C.msg||'આ પ્રમાણપત્ર અભિનંદન સાથે આપવામાં આવે છે',W/2,445);
+  var s=cfit(g,d.name,W-340,150,900,CSERIF,60);g.fillStyle='#1f1400';g.font='900 '+s+'px '+CSERIF;g.fillText(d.name,W/2,620);
+  var ln=g.createLinearGradient(W*.2,0,W*.8,0);ln.addColorStop(0,'rgba(184,134,11,0)');ln.addColorStop(.5,A);ln.addColorStop(1,'rgba(184,134,11,0)');g.fillStyle=ln;g.fillRect(W*.2,652,W*.6,4);
+  if(d.zone){g.fillStyle='#6b5a2e';g.font='700 42px '+CDISP;g.fillText('ZONE · '+d.zone,W/2,722)}
+  var lab=d.label,ps=cfit(g,lab,W-500,66,800,CSERIF,34);g.font='800 '+ps+'px '+CSERIF;var pw=g.measureText(lab).width+120;
+  g.fillStyle=A;g.beginPath();g.roundRect(W/2-pw/2,765,pw,104,52);g.fill();g.fillStyle='#fffaf0';g.fillText(lab,W/2,837);
+  g.fillStyle='#3b2a00';var dt0=d.detail||'';if(dt0){var dsz=cfit(g,dt0,W-300,44,700,CSERIF,24);g.font='700 '+dsz+'px '+CSERIF;g.fillText(dt0,W/2,945)}
+  var ev=C.event||'જ્ઞાન શોધ – Lucky Card Quiz Championship';g.fillStyle='#6b5a2e';var es=cfit(g,ev,W-300,32,700,CSANS,20);g.font='700 '+es+'px '+CSANS;g.fillText(ev,W/2,1020);
+  var dt=new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'});
+  g.font='600 28px '+CSANS;g.textAlign='left';g.fillText('તારીખ: '+dt,150,1135);g.textAlign='right';g.fillText('Room: '+(d.code||''),W-150,1135);
+  g.textAlign='center';if(C.signer){g.fillStyle='#1f1400';var ss=cfit(g,C.signer,420,40,700,CSERIF,22);g.font='italic 700 '+ss+'px '+CSERIF;g.fillText(C.signer,W/2,1100)}
+  g.fillStyle=A;g.fillRect(W/2-190,1112,380,2);g.fillStyle='#6b5a2e';g.font='600 26px '+CSANS;g.fillText(C.org||'Host / Organizer',W/2,1150);
+  return c}
+ function certLoad(url){return new Promise(function(res){if(!url)return res(null);var i=new Image();i.onload=function(){res(i)};i.onerror=function(){res(null)};i.src=url})}
+ var LOGO=null;
+ function cfgNow(){try{return JSON.parse(localStorage.getItem('certCfg')||'{}')}catch(e){return {}}}
+ function certCanvas(d){return certDraw(d,cfgNow(),LOGO)}
+ function prep(){var C=cfgNow();try{if(typeof socket!=='undefined'&&state&&state.code)socket.emit('host:setCert',{code:state.code,cert:C})}catch(e){}return certLoad(C.logo).then(function(i){LOGO=i})}
+
+ function ascii(s){return s}
+ function pdf(pages,pw,ph){ // pages: [{url (jpeg dataURL), w, h}] ; pw,ph in points
+  var enc=new TextEncoder(),parts=[],off=0,xref=[];function put(x){var b=typeof x==='string'?enc.encode(x):x;parts.push(b);off+=b.length}
+  function obj(n,body){xref[n]=off;put(n+' 0 obj\n'+body+'\nendobj\n')}
+  put('%PDF-1.4\n');var N=pages.length,kids=[];for(var i=0;i<N;i++)kids.push((3+i*3)+' 0 R');
+  obj(1,'<< /Type /Catalog /Pages 2 0 R >>');obj(2,'<< /Type /Pages /Kids ['+kids.join(' ')+'] /Count '+N+' >>');
+  pages.forEach(function(p,i){var pn=3+i*3,cn=pn+1,im=pn+2;var bin=atob(p.url.split(',')[1]),u8=new Uint8Array(bin.length);for(var k=0;k<bin.length;k++)u8[k]=bin.charCodeAt(k);
+   obj(pn,'<< /Type /Page /Parent 2 0 R /MediaBox [0 0 '+pw+' '+ph+'] /Resources << /XObject << /Im0 '+im+' 0 R >> >> /Contents '+cn+' 0 R >>');
+   var cs='q '+pw+' 0 0 '+ph+' 0 0 cm /Im0 Do Q';obj(cn,'<< /Length '+cs.length+' >>\nstream\n'+cs+'\nendstream');
+   xref[im]=off;put(im+' 0 obj\n<< /Type /XObject /Subtype /Image /Width '+p.w+' /Height '+p.h+' /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length '+u8.length+' >>\nstream\n');put(u8);put('\nendstream\nendobj\n')});
+  var total=3+N*3,xo=off;put('xref\n0 '+total+'\n0000000000 65535 f \n');for(var n=1;n<total;n++)put(String(xref[n]).padStart(10,'0')+' 00000 n \n');
+  put('trailer\n<< /Size '+total+' /Root 1 0 R >>\nstartxref\n'+xo+'\n%%EOF');return new Blob(parts,{type:'application/pdf'})}
+ function save(blob,name){var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){a.remove();URL.revokeObjectURL(a.href)},800)}
+ function winners(){var r=state.room,out=[];(WINNER_ORDER||[]).forEach(function(k){var d=wcData(k);if(d)out.push(d)});return out}
+ function zs(r){try{return zoneStats.length>=2?zoneStats(r,function(n){return playerResults(r,n)}):zoneStats(r)}catch(e){return []}}
+ function reportPages(){var r=state.room,pg=[],W=1240,H=1754,ws=winners(),Z=zs(r)||[];
+  function page(){var c=document.createElement('canvas');c.width=W;c.height=H;var g=c.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,W,H);g.fillStyle='#4c1d95';g.fillRect(0,0,W,16);g.textAlign='left';pg.push(c);return g}
+  var g=page();g.fillStyle='#4c1d95';g.font='900 54px '+SERIF;g.fillText('જ્ઞાન શોધ – Event Report',80,130);g.fillStyle='#555';g.font='600 28px '+SANS;g.fillText((gameName()||'')+' · Room '+r.code+' · '+new Date().toLocaleDateString('en-IN',{day:'2-digit',month:'long',year:'numeric'}),80,180);
+  var np=Object.keys(r.players||{}).length,tiles=[['👥 Players',np],['🏘 Zones',Z.length],['❓ Questions',(r.usedIdx||[]).length+'/'+(r.questions||[]).length]];
+  tiles.forEach(function(t,i){var x=80+i*370;g.fillStyle='#f3e8ff';g.beginPath();g.roundRect(x,230,340,150,24);g.fill();g.fillStyle='#4c1d95';g.font='900 56px '+SANS;g.textAlign='center';g.fillText(String(t[1]),x+170,310);g.font='600 26px '+SANS;g.fillText(t[0],x+170,356);g.textAlign='left'});
+  g.fillStyle='#1f1400';g.font='900 38px '+SERIF;g.fillText('🏆 Winners',80,470);var y=520;
+  ws.forEach(function(d,i){if(y>H-120){g=page();y=110}g.fillStyle=i%2?'#faf5ff':'#fff';g.fillRect(80,y-40,1080,76);g.fillStyle='#1f1400';var s0=fit(g,d.label,230,30,800,SANS,18);g.font='800 '+s0+'px '+SANS;g.fillText(d.label,95,y+4);var s=fit(g,d.name,300,32,800,SANS,18);g.font='800 '+s+'px '+SANS;g.fillText(d.name,345,y+4);g.fillStyle='#555';var s2=fit(g,d.zone||'',130,24,600,SANS,16);g.font='600 '+s2+'px '+SANS;g.fillText(d.zone||'',665,y+4);var s3=fit(g,d.detail||'',350,24,600,SANS,15);g.font='600 '+s3+'px '+SANS;g.fillText(d.detail||'',810,y+4);y+=76});
+  if(Z.length){if(y>H-300){g=page();y=110}else y+=40;g.fillStyle='#1f1400';g.font='900 38px '+SERIF;g.fillText('🏘 Zone-wise સરેરાશ Score',80,y);y+=50;
+   Z.slice(0,40).forEach(function(z,i){if(y>H-90){g=page();y=110}g.fillStyle=i%2?'#faf5ff':'#fff';g.fillRect(80,y-36,1080,64);g.fillStyle='#1f1400';g.font='700 28px '+SANS;g.fillText((i+1)+'. '+(z.zone||z.name||''),95,y+4);g.fillStyle='#555';g.font='600 26px '+SANS;g.fillText((z.count!=null?z.count+' Players':'')+(z.avg!=null?' · સરેરાશ '+(+z.avg).toFixed(1):''),620,y+4);y+=64})}
+  return pg}
+ function jpeg(c){return {url:c.toDataURL('image/jpeg',.92),w:c.width,h:c.height}}
+ window.CERT={
+  one:function(k){return fontsReady().then(prep).then(function(){var d=wcData(k);if(!d)return;certCanvas(d).toBlob(function(b){save(b,'certificate-'+d.label.replace(/[^\w઀-૿]+/g,'_')+'-'+d.name.replace(/[^\w઀-૿]+/g,'_')+'.png')})})},
+  allPdf:function(){return fontsReady().then(prep).then(function(){var ws=winners();if(!ws.length)return 0;var pgs=ws.map(function(d){return jpeg(certCanvas(d))});save(pdf(pgs,842,595),'certificates-'+state.room.code+'.pdf');return ws.length})},
+  report:function(){return fontsReady().then(function(){var pgs=reportPages().map(jpeg);save(pdf(pgs,595,842),'event-report-'+state.room.code+'.pdf');return pgs.length})},
+  list:winners,prep:prep,draw:function(d){return certCanvas(d)},fonts:fontsReady};
 })();
 </script>
 </body>

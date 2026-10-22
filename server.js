@@ -209,10 +209,10 @@ function pubPlayer(room,p){
 }
 function publicRoom(room){
   // Until results are revealed, never send correct answers or claim validity to browsers.
-  if (room.status==='revealed') return {...room, cfg:publicCfg()};
+  if (room.status==='revealed') return {...room, cert:undefined, cfg:publicCfg()};
   const players = {};
   for (const [n,p] of Object.entries(room.players)) players[n] = pubPlayer(room,p);
-  return {...room, cfg:publicCfg(), questions: room.questions.map(q=>({q:q.q, img:q.img, aud:q.aud})), players};
+  return {...room, cert:undefined, cfg:publicCfg(), questions: room.questions.map(q=>({q:q.q, img:q.img, aud:q.aud})), players};
 }
 // ---- 500-player friendly state: a PLAYER only receives his own data (+ the few winners after the reveal).
 // The HOST receives the full room, but at most about once per second.
@@ -227,7 +227,7 @@ function zoneStatsS(room){
 }
 function zoneProgOf(room){ const m={}, q=room.curIdx, live=(room.status==='question'||room.status==='locked'); for(const p of Object.values(room.players||{})){ const z=String((p&&p.zone)||'').trim(); if(!z) continue; const k=z.toLowerCase(); const o=m[k]||(m[k]={z,i:Object.keys(m).length,n:0,a:0,l:0}); o.n++; if(live&&q!=null&&Object.values(p.marks||{}).includes(q)) o.a++; } if(room.zlock) for(const k in m){ const zl=room.zlock[k]; if(zl&&zl.locks) m[k].l=zl.locks.reduce((s,x)=>s+(x?1:0),0); } return Object.values(m).slice(0,40); }
 function slimBase(room){
-  const { clientMap, tokens, players, ...rest } = room;
+  const { clientMap, tokens, cert, players, ...rest } = room;
   const n = Object.keys(players).length;
   if (room.status==='revealed'){
     const keep = {};
@@ -278,6 +278,7 @@ function seen(code,key){ if (key) SEEN[code+'|'+key]=Date.now(); }
 const ONLINE_MS = +process.env.ONLINE_MS || 10000;
 function bindSock(socket, r, code, name){ socket.data = {code, name}; seen(code,name); }
 
+function newPlayerObj(r,name,zone,avatar){ return { card: makeCard(r.questions), boxVals: makeBoxVals(), boxPick: Array(CFG.rounds).fill(null), baseName: name, zone, avatar: avatar||'🦁', marks:{}, claims:{}, joinedAt: Date.now() }; }
 function newToken(){ return 't'+Date.now().toString(36)+Math.random().toString(36).slice(2,10)+Math.random().toString(36).slice(2,10); }
 function tokFor(r,key){ if(!r.tokens) r.tokens={}; if(!r.tokens[key]) r.tokens[key]=newToken(); return r.tokens[key]; }
 function tokOwner(r,token){ if(!token||!r.tokens) return null; return Object.keys(r.tokens).find(k=>r.tokens[k]===token && r.players[k]) || null; }
@@ -333,6 +334,54 @@ io.on('connection', (socket) => {
   });
 
   // Host restores a game from the backup kept in the host's browser (after server sleep/restart).
+  // ---- Host tools: kick / rename / pre-test (test players) ----
+  function socksOf(code){ const ids=io.sockets.adapter.rooms.get(code), out=[]; if(ids) for(const id of ids){ const sk=io.sockets.sockets.get(id); if(sk) out.push(sk); } return out; }
+  function hostRoom(code){ const r=rooms[code]; return r||null; }
+  socket.on('host:kick', ({code,name}, cb) => {
+    const r=hostRoom(code); if(!r||!r.players[name]){ cb&&cb({ok:false}); return; }
+    delete r.players[name]; if(r.tokens) delete r.tokens[name]; if(r.clientMap) for(const c of Object.keys(r.clientMap)) if(r.clientMap[c]===name) delete r.clientMap[c];
+    for(const sk of socksOf(code)) if(sk.data && sk.data.name===name) sk.data={};
+    broadcast(code); cb&&cb({ok:true});
+  });
+  socket.on('host:rename', ({code,name,newName}, cb) => {
+    const r=hostRoom(code); newName=String(newName||'').trim().slice(0,40);
+    if(!r||!r.players[name]||!newName){ cb&&cb({ok:false,error:'નામ ખાલી છે.'}); return; }
+    if(r.status==='revealed'){ cb&&cb({ok:false,error:'Result પછી નામ બદલી શકાતું નથી.'}); return; }
+    if(newName===name){ cb&&cb({ok:true}); return; }
+    if(r.players[newName]){ cb&&cb({ok:false,error:'આ નામ પહેલેથી છે.'}); return; }
+    r.players[newName]=r.players[name]; r.players[newName].baseName=newName; delete r.players[name];
+    if(r.tokens&&r.tokens[name]){ r.tokens[newName]=r.tokens[name]; delete r.tokens[name]; }
+    if(r.clientMap) for(const c of Object.keys(r.clientMap)) if(r.clientMap[c]===name) r.clientMap[c]=newName;
+    if(SEEN[code+'|'+name]){ SEEN[code+'|'+newName]=SEEN[code+'|'+name]; delete SEEN[code+'|'+name]; }
+    for(const sk of socksOf(code)) if(sk.data && sk.data.name===name) sk.data={code,name:newName};
+    broadcast(code); cb&&cb({ok:true});
+  });
+  socket.on('host:addBots', ({code,n}, cb) => {
+    const r=hostRoom(code); if(!r){ cb&&cb({ok:false}); return; }
+    if(r.status!=='lobby'){ cb&&cb({ok:false,error:'Test Players fakt Game શરૂ થતા પહેલાં (Lobby માં) ઉમેરી શકાય.'}); return; }
+    n=Math.max(1,Math.min(1000,Math.round(+n||50)));
+    const zones=['Test-A','Test-B','Test-C','Test-D','Test-E']; let added=0;
+    for(let i=1;i<=n && Object.keys(r.players).length<2000;i++){ let k='Test '+(Object.values(r.players).filter(p=>p.bot).length+1); if(r.players[k]) continue;
+      const pl=newPlayerObj(r,k,zones[i%zones.length],['🦁','🐯','🐼','🐵','🦊'][i%5]); pl.bot=true; r.players[k]=pl; added++; }
+    const t0=Date.now(); const S=slimBase(r); const k0=Object.keys(r.players).find(k=>r.players[k].bot);
+    const hostBytes=JSON.stringify(publicRoom(r)).length, playerBytes=JSON.stringify(slimFor(r,S,k0)).length, ms=Date.now()-t0;
+    broadcast(code);
+    cb&&cb({ok:true, added, total:Object.keys(r.players).length, hostKB:Math.round(hostBytes/1024), playerKB:Math.round(playerBytes/1024), ms});
+  });
+  socket.on('host:clearBots', ({code}, cb) => {
+    const r=hostRoom(code); if(!r){ cb&&cb({ok:false}); return; }
+    let c=0; for(const k of Object.keys(r.players)) if(r.players[k].bot){ delete r.players[k]; c++; }
+    broadcast(code); cb&&cb({ok:true,removed:c});
+  });
+
+  socket.on('host:setCert', ({code,cert}, cb) => {
+    const r=rooms[code]; if(!r||!cert){ cb&&cb({ok:false}); return; }
+    const t=(x,n)=>String(x==null?'':x).slice(0,n);
+    const c={title:t(cert.title,60),sub:t(cert.sub,60),msg:t(cert.msg,120),event:t(cert.event,100),org:t(cert.org,60),signer:t(cert.signer,60),color:/^#[0-9a-f]{6}$/i.test(cert.color||'')?cert.color:''};
+    if(typeof cert.logo==='string' && /^data:image\/(png|jpeg|webp);base64,/.test(cert.logo) && cert.logo.length<=450000) c.logo=cert.logo;
+    r.cert=c; scheduleBackup(code); cb&&cb({ok:true});
+  });
+  socket.on('cert:get', ({code}, cb) => { const r=rooms[code]; cb&&cb({ok:!!r, cert:(r&&r.cert)||null, revealed:!!r&&r.status==='revealed'}); });
   socket.on('host:restore', ({room}, cb) => {
     try{
       if (!room || typeof room.code!=='string' || !room.players || !Array.isArray(room.questions)){ cb&&cb({ok:false,error:'Backup ખરાબ છે.'}); return; }
@@ -404,7 +453,7 @@ io.on('connection', (socket) => {
     broadcast(code);
   });
 
-  socket.on('host:start', ({code}) => { const r=rooms[code]; if(!r) return; r.status='active'; if(!r.startedAt) r.startedAt=Date.now(); broadcast(code); });
+  socket.on('host:start', ({code}) => { const r=rooms[code]; if(!r) return; for(const k of Object.keys(r.players)) if(r.players[k].bot) delete r.players[k]; r.status='active'; if(!r.startedAt) r.startedAt=Date.now(); broadcast(code); });
 
   const REVEAL_MS=1600;       // how long the big number popup stays up before the question appears
   const SPIN_SAFETY_MS=6000;  // safety net only — if host's browser never confirms, auto-advance so the game can't get stuck
@@ -506,7 +555,7 @@ io.on('connection', (socket) => {
     const norm = x => (x||'').trim().toLowerCase();
     // 0) the player's own secret token => always his own card (refresh / network drop / reopen)
     { const tk = tokOwner(r, token);
-      if(tk && norm(r.players[tk].baseName)===norm(name) && norm(r.players[tk].zone)===norm(zone)){
+      if(tk){
         if (clientId) r.clientMap[clientId] = tk;
         socket.join(code); bindSock(socket, r, code, tk);
         cb && cb({ok:true, room: slimFor(r,slimBase(r),tk), yourKey:tk, resumed:true, token:tokFor(r,tk)});
@@ -541,7 +590,7 @@ io.on('connection', (socket) => {
       let n=2; while(r.players[`${name} (${n})`]) n++;
       key = `${name} (${n})`;
     }
-    r.players[key] = { card: makeCard(r.questions), boxVals: makeBoxVals(), boxPick: Array(CFG.rounds).fill(null), baseName: name, zone, avatar: avatar||'🦁', marks:{}, claims:{}, joinedAt: Date.now() };
+    r.players[key] = newPlayerObj(r,name,zone,avatar);
     if(clientId) r.clientMap[clientId] = key;
     socket.join(code); bindSock(socket, r, code, key);
     const S1 = slimBase(r);
