@@ -1,3 +1,8 @@
+## 📺 Update (Projector sequence)
+- Lobby: 5:00 Join Timer (Projector par moto countdown, +1 minute / Timer bandh), pachhi "Game shuru karo".
+- Spin -> Wheel fare -> number -> Question + timer (30/45 sec) -> samay puro thaye Wheel pacho dekhay -> Host SPIN -> repeat.
+- Question par "Prashn 1" jevu lakhan kadhi nakhyu.
+
 ## 🏅 Update (Certificate edit + Logo + Player certificate)
 - 🛠 Host Tools > Certificates > "✏️ Certificate Edit / મારો Logo": Title, Sub-title, Message, Event naam, Sahi karnar nu naam, sahi niche lakhan, Colour ane potano Logo upload. "Save + Players ne batavo" thi winners na phone ma e j Certificate dekhay.
 - Winner Player ne Result reveal ma tena category aavya pachhi "🏅 Maru Certificate" button; image par long-press kari Save ke Download.

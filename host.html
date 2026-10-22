@@ -2344,15 +2344,15 @@ function pvAnnounce(r){var O=(typeof WINNER_ORDER!=='undefined')?WINNER_ORDER:[]
   return '<div class="pjconf">'+o+'</div>'}
  function btn(a,t,c){return '<button data-act="'+a+'"'+(c?' class="'+c+'"':'')+'>'+t+'</button>'}
  function ctl(r){var st=r.status,b='';
-  if(st==='lobby')b=btn('start','▶ Game શરૂ કરો','go');
+  if(st==='lobby')b=(r.joinEnd?btn('jtp','＋1 મિનિટ')+btn('jtx','⏹ Timer બંધ','sk'):btn('jt5','⏱ 5:00 Join Timer શરૂ'))+btn('start','▶ Game શરૂ કરો','go');
   else if(st==='active'||st==='locked')b=btn('spin','🎡 SPIN','go')+(st==='locked'?'':'')+btn('end','🏁 Game પૂરી','sk');
   else if(st==='question')b=(r.paused?btn('resume','▶ Resume','go'):btn('pause','⏸ Pause'))+btn('skip','⏭ Time Skip','sk');
   else if(st==='ended')b=btn('reveal','🏆 Result Reveal કરો','go');
   else if(st==='revealed'){var O=(typeof WINNER_ORDER!=='undefined')?WINNER_ORDER:[];b=((r.revealStep||0)<=O.length)?btn('next','⏭ આગળ (Next Winner)','go'):''}
   return b?'<div class="pjbar">'+b+'</div>':''}
- function stage(r){var h='';try{if(!wheelLayout&&typeof computeLayout==='function')wheelLayout=computeLayout(r);
+ function stage(r){var h='';try{if((!wheelLayout||!spinning)&&typeof computeLayout==='function')wheelLayout=computeLayout(r);
    h=(typeof drawStage==='function')?drawStage(r):wheelSVG(wheelLayout,wheelRotation,pendingReveal)}catch(e){h=''}
-  var n=(typeof pendingReveal!=='undefined'&&pendingReveal!=null&&!spinning)?pendingReveal:null;
+  var n=(typeof pendingReveal!=='undefined'&&pendingReveal!=null&&!spinning&&r.status==='revealing')?pendingReveal:null;
   return '<div class="pjstg"><div class="pjwh">'+h+'</div>'+(n!=null?'<div class="pjnum"><div class="pjs">પ્રશ્ન નંબર</div><div class="pjbig pjw">'+n+'</div></div>':'')+'</div>'}
  function claim(r,k){var w=r.winners||{},ms=w[k+'_ms'],ts=w[k+'_ts'],tie=w[k+'_tie'],o='';
   if(ms!=null&&typeof fmtDur==='function')o+='⏱ '+esc2(fmtDur(ms))+' માં Claim';
@@ -2360,9 +2360,11 @@ function pvAnnounce(r){var O=(typeof WINNER_ORDER!=='undefined')?WINNER_ORDER:[]
   if(ts){try{o+=(o?' · ':'')+'🕒 '+new Date(ts).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}catch(e){}}
   return (o||tie)?'<div class="pjclaim">'+o+(tie?'<small>⚖️ Tie-break: '+esc2(tie===true?'સૌથી પહેલા Claim':tie)+'</small>':'')+'</div>':''}
  function html(r){var st=r.status;
-  if(st==='active'||st==='spinning'||st==='revealing'){
-   return '<div class="pjh">જ્ઞાન શોધ</div>'+stage(r)+(st==='active'&&!(r.usedIdx||[]).length?'<div class="pjs">Game શરૂ થાય છે…</div>':'')+(st==='revealing'?'<div class="pjs">હવે પ્રશ્ન આવે છે…</div>':'')+bars(r)+ctl(r)}
+  if(st==='active'||st==='spinning'||st==='revealing'||st==='locked'){
+   return '<div class="pjh">જ્ઞાન શોધ</div>'+(st==='locked'?'<div class="pjfire" style="background:linear-gradient(90deg,#475569,#1e293b);box-shadow:none;animation:none">⏱ સમય પૂરો — હવે Spin દબાવો</div>':'')+stage(r)+(st==='active'&&!(r.usedIdx||[]).length?'<div class="pjs">Game શરૂ થાય છે…</div>':'')+(st==='revealing'?'<div class="pjs">હવે પ્રશ્ન આવે છે…</div>':'')+bars(r)+ctl(r)}
   var h=html0(r);
+  if(st==='question'){h=h.replace(/<div class="pjs">પ્રશ્ન \d+[^<]*<\/div>/,r.round!=null?'<div class="pjs">Round '+((r.round||0)+1)+'</div>':'')}
+  if(st==='lobby'){h=h.replace('<div class="pjrow">','<div id="pjjw"></div><div class="pjrow">')}
   if(st==='question'&&!r.paused){h=h.replace('<div class="pjh">',fireChk(r)+'<div class="pjh">')}
   if((st==='question'||st==='locked')&&r.curIdx!=null)h=h.replace('<div class="pjh">','<div class="pjchip">🎡 નંબર '+(r.curIdx+1)+'</div><div class="pjh">');
   if(st==='revealed'){var O=(typeof WINNER_ORDER!=='undefined')?WINNER_ORDER:[],step=r.revealStep||0;
@@ -2377,6 +2379,8 @@ function pvAnnounce(r){var O=(typeof WINNER_ORDER!=='undefined')?WINNER_ORDER:[]
   return fireZone?'<div class="pjfire">🔥 '+esc2(fireZone)+' — સૌથી પહેલા બધાએ જવાબ આપ્યો!</div>':''}
  function sfxTick(r){try{if(r.status==='question'&&!r.paused){var rem=Math.max(0,Math.ceil(((r.timerEnd||0)-Date.now())/1000));if(rem!==lastRem){lastRem=rem;if(rem>0&&rem<=5)playTick()}}else lastRem=-1;
   if(r.status==='revealed'){var st=r.revealStep||0;if(st!==lastStep){lastStep=st;if(st>=1)playFanfare()}}else lastStep=-1}catch(e){}}
+ function jtHTML(r){var e=r.joinEnd;if(!e)return '';var rem=Math.max(0,Math.ceil((e-Date.now())/1000)),m=Math.floor(rem/60),sc=rem%60;
+  return rem>0?'<div class="pjs">⏳ Join થવાનો બાકી સમય</div><div class="pjt'+(rem<=30?' lo':'')+'">'+m+':'+(sc<10?'0':'')+sc+'</div>':'<div class="pjfire">⏰ Join સમય પૂરો — હવે Game શરૂ કરો</div>'}
  function html0(r){
   var st=r.status,gm=document.title.replace(/^.*?[—\-–]\s*/,'').replace(/Host\s*/,'');
   var head='<div class="pjh">જ્ઞાન શોધ</div>';
@@ -2393,9 +2397,10 @@ function pvAnnounce(r){var O=(typeof WINNER_ORDER!=='undefined')?WINNER_ORDER:[]
   if(st==='ended')return head+'<div class="pjbig">🙏</div><div class="pjs">રમત પૂરી — Result ટૂંક સમયમાં</div>';
   if(st==='active'||st==='spinning'||st==='revealing'){var n2=(r.usedIdx||[]).length;return head+'<div class="pjbig">🎡</div><div class="pjs">'+(n2?'પ્રશ્ન '+n2+' પછી…':'Game શરૂ થાય છે…')+'</div>'+bars(r)}
   return head+'<div class="pjbig">🎁</div><div class="pjs">'+(r.round!=null?'Round '+((r.round||0)+1)+' · ':'')+'થોભો…</div>'}
- function paint(){if(!open)return;if(typeof spinning!=="undefined"&&spinning)return;var r=(typeof state!=='undefined')&&state.room;var o=document.getElementById('pj');if(!o||!r)return;pvAnnounce(r);sfxTick(r);var h=html(r);if(h!==last){last=h;o.querySelector('.pjin').innerHTML=h}}
+ function paint(){paint0();var o=document.getElementById('pj'),r=(typeof state!=='undefined')&&state.room;if(open&&o&&r&&r.status==='lobby'){var w=o.querySelector('#pjjw');if(w)w.innerHTML=jtHTML(r)}}
+ function paint0(){if(!open)return;if(typeof spinning!=="undefined"&&spinning)return;var r=(typeof state!=='undefined')&&state.room;var o=document.getElementById('pj');if(!o||!r)return;pvAnnounce(r);sfxTick(r);var h=html(r);var jw=o.querySelector('#pjjw');if(h!==last){last=h;o.querySelector('.pjin').innerHTML=h}}
  function toggle(on){open=(on===undefined)?!open:on;var o=document.getElementById('pj');o.style.display=open?'flex':'none';if(open){last='';paint();try{if(o.requestFullscreen)o.requestFullscreen()}catch(e){}iv=setInterval(paint,500)}else{clearInterval(iv);try{o.querySelector('.pjin').innerHTML='';last=''}catch(e){}try{if(document.fullscreenElement)document.exitFullscreen()}catch(e){}}}
- function init(){var o=document.createElement('div');o.id='pj';o.style.display='none';o.innerHTML='<button class="pjx" aria-label="Close">✕</button><button class="pjv" aria-label="Voice">🔊</button><div class="pjin"></div>';o.querySelector('.pjv').onclick=function(){PV.on=!PV.on;this.textContent=PV.on?'🔊':'🔇';try{speechSynthesis.cancel()}catch(e){}};document.body.insertBefore(o,document.body.firstChild);o.querySelector('.pjin').onclick=function(e){var t=e.target.closest&&e.target.closest('[data-act]');if(!t)return;var a=t.getAttribute('data-act'),f={start:'hostStart',spin:'hostSpin',pause:'hostPause',resume:'hostResume',skip:'hostSkipTimer',reveal:'hostReveal',next:'hostNextWinner',end:'hostEnd'}[a];try{if(f&&typeof window[f]==='function')window[f]();else if(f)eval(f+'()')}catch(x){}};o.querySelector('.pjx').onclick=function(){toggle(false)};
+ function init(){var o=document.createElement('div');o.id='pj';o.style.display='none';o.innerHTML='<button class="pjx" aria-label="Close">✕</button><button class="pjv" aria-label="Voice">🔊</button><div class="pjin"></div>';o.querySelector('.pjv').onclick=function(){PV.on=!PV.on;this.textContent=PV.on?'🔊':'🔇';try{speechSynthesis.cancel()}catch(e){}};document.body.insertBefore(o,document.body.firstChild);o.querySelector('.pjin').onclick=function(e){var t=e.target.closest&&e.target.closest('[data-act]');if(!t)return;var a=t.getAttribute('data-act'),f={start:'hostStart',spin:'hostSpin',pause:'hostPause',resume:'hostResume',skip:'hostSkipTimer',reveal:'hostReveal',next:'hostNextWinner',end:'hostEnd'}[a];if(a==='jt5'){socket.emit('host:joinTimer',{code:state.code,sec:300});return}if(a==='jtp'){var rr=state.room,rm=Math.max(0,Math.ceil(((rr&&rr.joinEnd||0)-Date.now())/1000));socket.emit('host:joinTimer',{code:state.code,sec:rm+60});return}if(a==='jtx'){socket.emit('host:joinTimer',{code:state.code,sec:0});return}try{if(f&&typeof window[f]==='function')window[f]();else if(f)eval(f+'()')}catch(x){}};o.querySelector('.pjx').onclick=function(){toggle(false)};
   var b=document.createElement('button');b.id='hproj';b.type='button';b.setAttribute('aria-label','Projector');b.textContent='📺';b.onclick=function(){toggle(true)};document.body.appendChild(b);
   document.addEventListener('keydown',function(e){if(e.key==='Escape'&&open)toggle(false)});document.addEventListener('fullscreenchange',function(){if(open&&!document.fullscreenElement){}})}
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
