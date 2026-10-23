@@ -368,6 +368,7 @@ io.on('connection', (socket) => {
     broadcast(code);
     cb&&cb({ok:true, added, total:Object.keys(r.players).length, hostKB:Math.round(hostBytes/1024), playerKB:Math.round(playerBytes/1024), ms});
   });
+  socket.on('host:botsPlay', ({code,on}, cb) => { const r=hostRoom(code); if(!r){ cb&&cb({ok:false}); return; } r.botsPlay=!!on; cb&&cb({ok:true,on:r.botsPlay}); });
   socket.on('host:clearBots', ({code}, cb) => {
     const r=hostRoom(code); if(!r){ cb&&cb({ok:false}); return; }
     let c=0; for(const k of Object.keys(r.players)) if(r.players[k].bot){ delete r.players[k]; c++; }
@@ -382,6 +383,13 @@ io.on('connection', (socket) => {
     r.cert=c; scheduleBackup(code); cb&&cb({ok:true});
   });
   socket.on('cert:get', ({code}, cb) => { const r=rooms[code]; cb&&cb({ok:!!r, cert:(r&&r.cert)||null, revealed:!!r&&r.status==='revealed'}); });
+  // 📶 how many players are really connected right now (players ping us every ~4 s)
+  socket.on('host:online', ({code}, cb) => {
+    const r = rooms[code]; if(!r || typeof cb!=='function') return;
+    const now = Date.now(); let on=0, tot=0; const off=[];
+    for (const k of Object.keys(r.players)){ const p=r.players[k]; if(p.bot) continue; tot++; const t=SEEN[code+'|'+k]||0; if(now-t <= ONLINE_MS+5000) on++; else off.push(k); }
+    cb({ok:true, online:on, total:tot, off:off.slice(0,12)});
+  });
   socket.on('host:joinTimer', ({code,sec}, cb) => {
     const r=rooms[code]; if(!r){ cb&&cb({ok:false}); return; }
     sec=Math.round(+sec); r.joinEnd = (sec>0 && sec<=3600) ? Date.now()+sec*1000 : null; broadcast(code); cb&&cb({ok:true});
@@ -457,7 +465,7 @@ io.on('connection', (socket) => {
     broadcast(code);
   });
 
-  socket.on('host:start', ({code}) => { const r=rooms[code]; if(!r) return; r.joinEnd=null; for(const k of Object.keys(r.players)) if(r.players[k].bot) delete r.players[k]; r.status='active'; if(!r.startedAt) r.startedAt=Date.now(); broadcast(code); });
+  socket.on('host:start', ({code}) => { const r=rooms[code]; if(!r) return; r.joinEnd=null; if(!r.botsPlay) for(const k of Object.keys(r.players)) if(r.players[k].bot) delete r.players[k]; r.status='active'; if(!r.startedAt) r.startedAt=Date.now(); broadcast(code); });
 
   const REVEAL_MS=1600;       // how long the big number popup stays up before the question appears
   const SPIN_SAFETY_MS=6000;  // safety net only — if host's browser never confirms, auto-advance so the game can't get stuck
@@ -640,4 +648,22 @@ io.on('connection', (socket) => {
 });
 
 const PORT = process.env.PORT || 3000;
+// 🤖 Test bots that really answer (only when the host switched "Bots play" on) — for a full dry-run
+setInterval(()=>{
+  for (const code of Object.keys(rooms)){
+    const r=rooms[code]; if(!r || !r.botsPlay || r.status!=='question' || r.paused || r.curIdx==null) continue;
+    const q=r.questions[r.curIdx]; if(!q) continue; let changed=false;
+    for (const p of Object.values(r.players)){
+      if(!p.bot || !p.card || Object.values(p.marks||{}).includes(r.curIdx)) continue;
+      if(Math.random()>0.25) continue;
+      const free=[]; for(let i=0;i<25;i++) if(p.marks[i]===undefined) free.push(i);
+      if(!free.length) continue;
+      const right=p.card.indexOf(q.a); let ci;
+      if(right>=0 && p.marks[right]===undefined && Math.random()<0.7) ci=right; else { if(Math.random()<0.2) continue; ci=free[Math.floor(Math.random()*free.length)]; }
+      p.marks[ci]=r.curIdx; if(p.markTs) p.markTs[r.curIdx]=Date.now(); changed=true;
+    }
+    if(changed && (!r._bb || Date.now()-r._bb>2000)){ r._bb=Date.now(); broadcast(code); }
+  }
+}, 1000);
+
 server.listen(PORT, () => console.log('Gyan Shodh Quiz server running on port '+PORT));

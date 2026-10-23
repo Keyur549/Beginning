@@ -1,3 +1,15 @@
+## 🆕 Update 3
+- 🧪 Practice: 5 question, 5×5 card ma 1 Line banavo, Claim karo ane Claim Time dekhay
+- Report ma 5×5 card na darek khana par Question badge (Q3...)
+- 🤖 Host Tools: Test Players game ma pan rahe ane jawab aape (fakt test game)
+Upload only: server.js, host.html, player.html
+
+## 🆕 Update
+- 📥 Excel/CSV mathi Questions Import (Create Room screen) + Sample template
+- 📶 Projector ma live Online counter
+- Epilogue: 🛡 Safety Net kadhi nakhi (5 life line)
+Upload only: server.js, host.html, player.html
+
 ## 🎬 Update (Projector full control + Cards)
 - Projector (📺) parthi j start→end: Round pooro / Mystery Box (Beginning), Next Round, Result Reveal, Next Winner, 📊 Dashboard, 🎁 Scratch Card Reveal, ⬇ Excel.
 - Report Card ma 5×5 card (badhi games).

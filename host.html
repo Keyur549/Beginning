@@ -167,6 +167,7 @@ input:focus,select:focus{outline:none;border-color:var(--pl);box-shadow:0 0 0 3p
 
 .pjfire{background:linear-gradient(90deg,#f97316,#dc2626);border-radius:99px;padding:6px 24px;font-weight:900;font-size:clamp(1rem,2.6vh,1.8rem);color:#fff;box-shadow:0 0 28px rgba(249,115,22,.8);animation:pjfp .9s ease-in-out infinite alternate}@keyframes pjfp{to{transform:scale(1.06)}}
 .tcr{display:flex;gap:6px;align-items:center;padding:4px 0;border-top:1px dashed var(--line);font-size:.85rem}.tcr b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.tcr button{border:0;background:var(--bg);border-radius:10px;padding:5px 9px;cursor:pointer}
+.pjon{position:fixed;left:14px;top:12px;z-index:6;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.35);border-radius:99px;padding:6px 14px;font-weight:800;font-size:clamp(.8rem,1.6vw,1.15rem);color:#bbf7d0}.pjon.w{color:#fecaca}.pjon small{font-weight:600;opacity:.85;margin-left:6px}
 </style>
 </head>
 <body>
@@ -2173,6 +2174,14 @@ function render(){
       <input id="maxPlayers" type="number" min="1" placeholder="Max Players (ખાલી = limit નહિ)">
       <div class="muted">Questions Round pramane: સૌથી ઉપર <b>Round 1</b> લખો, પછી તેના બરાબર 5 Question (<b>Question::Answer</b>, એક લાઇનમાં એક; ફોટો માટે લાઇનના અંતે [img:q1.jpg], અવાજ માટે [audio:geet.mp3]). એ જ રીતે Round 7 સુધી, કુલ 35. ફોટો માટે લાઇનના અંતે [img:q6.jpg] ઉમેરો. ખાલી છોડો તો <b>questions.txt</b> ના 35 Questions વપરાશે.</div>
       <button class="btn ghost" type="button" onclick="loadQAIntoTextarea()">📋 હાલના 35 Questions Load કરો (Edit/Add કરવા)</button>
+      <div class="card" style="margin:8px 0;background:#f0fdfa;border:2px dashed #14b8a6">
+        <b>📥 Excel / CSV માંથી Questions Import કરો</b>
+        <div class="muted" style="font-size:.85rem;line-height:1.5">File ની <b>પહેલી Sheet</b> માં: <b>Column A = Question</b>, <b>Column B = Answer</b>, (વૈકલ્પિક) <b>Column C = Image</b> (જેમ કે q2.jpg અથવા https://… link), <b>Column D = Audio</b> (geet.mp3). પહેલી Row માં Heading (Question / Answer) હોય તો આપોઆપ છૂટી જશે. એક Row = એક Question. .xlsx, .csv, .txt ચાલે.</div>
+        <input type="file" id="qaFile" accept=".xlsx,.csv,.tsv,.txt,text/csv" style="display:none" onchange="qaImport(this)">
+        <button class="btn secondary" type="button" onclick="document.getElementById('qaFile').click()">📥 Excel / CSV ખોલો</button>
+        <button class="btn ghost" type="button" onclick="qaTemplate()">⬇ Sample Excel Template</button>
+        <div id="qaImpMsg" class="muted" style="margin-top:4px"></div>
+      </div>
       <textarea id="qaText" rows="6"></textarea>
       <button class="btn" onclick="uiCreateRoom()">Create Room</button>
     </div>` : `
@@ -2400,9 +2409,12 @@ function pvAnnounce(r){var O=(typeof WINNER_ORDER!=='undefined')?WINNER_ORDER:[]
   if(st==='ended')return head+'<div class="pjbig">🙏</div><div class="pjs">રમત પૂરી — Result ટૂંક સમયમાં</div>';
   if(st==='active'||st==='spinning'||st==='revealing'){var n2=(r.usedIdx||[]).length;return head+'<div class="pjbig">🎡</div><div class="pjs">'+(n2?'પ્રશ્ન '+n2+' પછી…':'Game શરૂ થાય છે…')+'</div>'+bars(r)}
   return head+'<div class="pjbig">🎁</div><div class="pjs">'+(r.round!=null?'Round '+((r.round||0)+1)+' · ':'')+'થોભો…</div>'}
- function paint(){paint0();var o=document.getElementById('pj'),r=(typeof state!=='undefined')&&state.room;if(open&&o&&r&&r.status==='lobby'){var w=o.querySelector('#pjjw');if(w)w.innerHTML=jtHTML(r)}}
+ var ON={on:null,tot:0,off:[]},onT=null;
+ function onPoll(){try{if(!open||typeof state==='undefined'||!state.code)return;socket.emit('host:online',{code:state.code},function(d){if(d&&d.ok){ON={on:d.online,tot:d.total,off:d.off||[]}}})}catch(e){}}
+ function onBadge(){if(ON.on==null)return '';var w=ON.tot>0&&ON.on<ON.tot;return '<div class="pjon'+(w?' w':'')+'">🟢 '+ON.on+' / '+ON.tot+' Online'+(w?'<small>📵 '+(ON.tot-ON.on)+' offline'+(ON.off&&ON.off.length?': '+esc2(ON.off.slice(0,3).join(', '))+(ON.off.length>3?'…':''):'')+'</small>':'')+'</div>'}
+ function paint(){paint0();var oo=document.getElementById('pj');if(open&&oo){var bd=oo.querySelector('.pjon'),nb=onBadge();if(!nb){if(bd)bd.remove()}else if(bd){if(bd.outerHTML!==nb)bd.outerHTML=nb}else oo.insertAdjacentHTML('afterbegin',nb)}var o=document.getElementById('pj'),r=(typeof state!=='undefined')&&state.room;if(open&&o&&r&&r.status==='lobby'){var w=o.querySelector('#pjjw');if(w)w.innerHTML=jtHTML(r)}}
  function paint0(){if(!open)return;if(typeof spinning!=="undefined"&&spinning)return;var r=(typeof state!=='undefined')&&state.room;var o=document.getElementById('pj');if(!o||!r)return;pvAnnounce(r);sfxTick(r);var h=html(r);var jw=o.querySelector('#pjjw');if(h!==last){last=h;o.querySelector('.pjin').innerHTML=h}}
- function toggle(on){open=(on===undefined)?!open:on;var o=document.getElementById('pj');o.style.display=open?'flex':'none';if(open){last='';paint();try{var de=document.documentElement;if(de.requestFullscreen)de.requestFullscreen()}catch(e){}iv=setInterval(paint,500)}else{clearInterval(iv);try{o.querySelector('.pjin').innerHTML='';last=''}catch(e){}try{if(document.fullscreenElement)document.exitFullscreen()}catch(e){}}}
+ function toggle(on){open=(on===undefined)?!open:on;var o=document.getElementById('pj');o.style.display=open?'flex':'none';if(open){last='';paint();try{var de=document.documentElement;if(de.requestFullscreen)de.requestFullscreen()}catch(e){}iv=setInterval(paint,500);onPoll();onT=setInterval(onPoll,3000)}else{clearInterval(iv);clearInterval(onT);try{o.querySelector('.pjin').innerHTML='';last=''}catch(e){}try{if(document.fullscreenElement)document.exitFullscreen()}catch(e){}}}
  function init(){var o=document.createElement('div');o.id='pj';o.style.display='none';o.innerHTML='<button class="pjx" aria-label="Close">✕</button><button class="pjv" aria-label="Voice">🔊</button><div class="pjin"></div>';o.querySelector('.pjv').onclick=function(){PV.on=!PV.on;this.textContent=PV.on?'🔊':'🔇';try{speechSynthesis.cancel()}catch(e){}};document.body.insertBefore(o,document.body.firstChild);o.querySelector('.pjin').onclick=function(e){var t=e.target.closest&&e.target.closest('[data-act]');if(!t)return;var a=t.getAttribute('data-act'),f={start:'hostStart',spin:'hostSpin',pause:'hostPause',resume:'hostResume',skip:'hostSkipTimer',reveal:'hostReveal',next:'hostNextWinner',end:'hostEnd',startbox:'hostStartBox',nextround:'hostNextRound',dash:'openDashboard',xls:'downloadExcel'}[a];if(a==='sc'){var r3=state.room;hostScReveal(!(r3&&r3.scReveal));return}if(a&&a.indexOf('draw_')===0){hostSetDraw(a.slice(5));return}if(a==='jt5'){socket.emit('host:joinTimer',{code:state.code,sec:300});return}if(a==='jtp'){var rr=state.room,rm=Math.max(0,Math.ceil(((rr&&rr.joinEnd||0)-Date.now())/1000));socket.emit('host:joinTimer',{code:state.code,sec:rm+60});return}if(a==='jtx'){socket.emit('host:joinTimer',{code:state.code,sec:0});return}try{if(f&&typeof window[f]==='function')window[f]();else if(f)eval(f+'()')}catch(x){}};o.querySelector('.pjx').onclick=function(){toggle(false)};
   var b=document.createElement('button');b.id='hproj';b.type='button';b.setAttribute('aria-label','Projector');b.textContent='📺';b.onclick=function(){toggle(true)};document.body.appendChild(b);
   document.addEventListener('keydown',function(e){if(e.key==='Escape'&&open)toggle(false)});document.addEventListener('fullscreenchange',function(){if(open&&!document.fullscreenElement){}})}
@@ -2420,7 +2432,7 @@ function pvAnnounce(r){var O=(typeof WINNER_ORDER!=='undefined')?WINNER_ORDER:[]
  function dl(name,txt){var b=new Blob([txt],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){a.remove();URL.revokeObjectURL(a.href)},500)}
  function build(){o.innerHTML='<div class="hin"><div class="hcard"><div class="hhd"><b>🛠 Host Tools</b><button class="hx" id="tx">✕</button></div>'+
   '<div class="tsec"><h3>👥 Players (<span id="tc">0</span>) — Rename / Kick</h3><input type="search" id="tq" placeholder="નામ / Zone શોધો…"><div id="tl"></div></div>'+
-  '<div class="tsec"><h3>🤖 Pre-test (Test Players)</h3><div class="muted" style="font-size:.8rem">Lobby માં નકલી Players ઉમેરી જુઓ કે Server/Host કેટલું ભારે થાય છે. Game શરૂ કરતાં જ બધા Test Players આપોઆપ નીકળી જાય છે.</div><input type="number" id="tn" min="1" max="1000" value="50"><div class="tbt"><button id="tadd">➕ Test Players ઉમેરો</button><button class="r" id="tclr">🧹 Test Players કાઢો</button></div><div class="tmsg" id="tmsg"></div></div>'+
+  '<div class="tsec"><h3>🤖 Pre-test (Test Players)</h3><div class="muted" style="font-size:.8rem">Lobby માં નકલી Players ઉમેરી જુઓ કે Server/Host કેટલું ભારે થાય છે. Game શરૂ કરતાં જ બધા Test Players આપોઆપ નીકળી જાય છે.</div><input type="number" id="tn" min="1" max="1000" value="50"><label style="display:block;margin:6px 0;font-size:.85rem"><input type="checkbox" id="tplay"> 🎮 Test Players Game ma pan rahe ane jawab aape <b>(fakt Test game — real game ma ON na karvu)</b></label><div class="tbt"><button id="tadd">➕ Test Players ઉમેરો</button><button class="r" id="tclr">🧹 Test Players કાઢો</button></div><div class="tmsg" id="tmsg"></div></div>'+
   '<div class="tsec"><h3>🏅 Certificates & Report</h3><div class="muted" style="font-size:.8rem">Result Reveal પછી: દરેક Winner નું Certificate (PNG) અથવા બધાનું એક PDF, અને Event Report PDF.</div><details style="margin:8px 0"><summary style="cursor:pointer;font-weight:800">✏️ Certificate Edit / મારો Logo</summary><div style="display:grid;gap:6px;margin-top:6px"><input type="text" id="ce_title" placeholder="Title (પ્રમાણપત્ર)"><input type="text" id="ce_sub" placeholder="Sub-title (CERTIFICATE OF ACHIEVEMENT)"><input type="text" id="ce_msg" placeholder="Message line"><input type="text" id="ce_event" placeholder="Event / સંસ્થા નું નામ"><input type="text" id="ce_signer" placeholder="સહી કરનાર નું નામ (વૈકલ્પિક)"><input type="text" id="ce_org" placeholder="સહી નીચે લખાણ (Host / Organizer)"><label style="font-size:.85rem">Colour <input type="color" id="ce_color" value="#b8860b"></label><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><img id="ce_logo" alt="" style="max-height:56px;max-width:140px;display:none;border:1px solid var(--line);border-radius:8px;background:#fff"><button type="button" id="ce_up" style="border:0;border-radius:10px;padding:8px 12px;font:inherit;font-weight:800;cursor:pointer">🖼 Logo Upload</button><button type="button" id="ce_rm" style="border:0;border-radius:10px;padding:8px 12px;font:inherit;cursor:pointer">✖ Logo કાઢો</button></div><input type="file" id="ce_f" accept="image/png,image/jpeg,image/webp" style="display:none"><div class="tbt"><button id="ce_save">💾 Save + Players ને બતાવો</button><button id="ce_pv" class="r" style="background:#475569">👁 Preview</button></div><img id="ce_img" alt="" style="width:100%;border-radius:10px;display:none;border:1px solid var(--line)"></div></details><div id="tcr"></div><div class="tbt"><button id="tcall">📄 બધા Certificates (PDF)</button><button id="trep">📊 Event Report (PDF)</button></div><div class="tmsg" id="tcm"></div></div>'+
   '<div class="tsec"><h3>🔊 Sound Pack (Wheel / Timer / Winner)</h3><select id="tsp" style="width:100%;padding:9px;border-radius:10px;border:1px solid var(--line);font:inherit"></select><div class="tbt"><button id="tspt">▶ Test Sound</button></div></div>'+
   '<div class="tsec"><h3>💾 Backup</h3><div class="muted" style="font-size:.8rem">Game નું છેલ્લું Backup (દર થોડી સેકન્ડે આપોઆપ browser માં સચવાય છે) ફાઇલ તરીકે Download કરો. Laptop/Browser બદલવો પડે તો ફાઇલ થી Restore થાય.</div><div class="tbt"><button id="tdl">⬇️ Backup Download</button><button id="tup">📂 File થી Restore</button></div><input type="file" id="tf" accept=".json,application/json" style="display:none"><div class="tmsg" id="tbm"></div></div></div></div>';
@@ -2430,6 +2442,8 @@ function pvAnnounce(r){var O=(typeof WINNER_ORDER!=='undefined')?WINNER_ORDER:[]
    if(t.dataset.k){if(confirm('"'+t.dataset.k+'" ને Game માંથી કાઢી નાખવા?'))socket.emit('host:kick',{code:c,name:t.dataset.k},function(){paintList()})}
    else if(t.dataset.r){var nn=prompt('નવું નામ:',t.dataset.r);if(nn)socket.emit('host:rename',{code:c,name:t.dataset.r,newName:nn},function(res){if(res&&!res.ok)alert(res.error||'થયું નહિ');paintList()})}};
   o.querySelector('#tadd').onclick=function(){var m=o.querySelector('#tmsg');m.textContent='ઉમેરાય છે…';socket.emit('host:addBots',{code:state.code,n:+o.querySelector('#tn').value},function(r){m.textContent=r&&r.ok?('✅ '+r.added+' Test Players ઉમેર્યા · કુલ '+r.total+' · Host update ≈ '+r.hostKB+' KB · Player update ≈ '+r.playerKB+' KB · Server ગણતરી '+r.ms+' ms. (Host update 2000 KB થી મોટું હોય તો Render free plan માં ધીમું પડી શકે.)'):('⚠️ '+((r&&r.error)||'થયું નહિ'))})};
+  o.querySelector('#tplay').checked=!!(state.room&&state.room.botsPlay);
+  o.querySelector('#tplay').onchange=function(){socket.emit('host:botsPlay',{code:state.code,on:this.checked})};
   o.querySelector('#tclr').onclick=function(){socket.emit('host:clearBots',{code:state.code},function(r){o.querySelector('#tmsg').textContent=r&&r.ok?('🧹 '+r.removed+' Test Players કાઢ્યા'):'થયું નહિ'})};
   (function(){var C={};try{C=JSON.parse(localStorage.getItem('certCfg')||'{}')}catch(x){}
    var F={ce_title:'title',ce_sub:'sub',ce_msg:'msg',ce_event:'event',ce_signer:'signer',ce_org:'org'};Object.keys(F).forEach(function(id){o.querySelector('#'+id).value=C[F[id]]||''});
@@ -2523,6 +2537,45 @@ function pvAnnounce(r){var O=(typeof WINNER_ORDER!=='undefined')?WINNER_ORDER:[]
   allPdf:function(){return fontsReady().then(prep).then(function(){var ws=winners();if(!ws.length)return 0;var pgs=ws.map(function(d){return jpeg(certCanvas(d))});save(pdf(pgs,842,595),'certificates-'+state.room.code+'.pdf');return ws.length})},
   report:function(){return fontsReady().then(function(){var pgs=reportPages().map(jpeg);save(pdf(pgs,595,842),'event-report-'+state.room.code+'.pdf');return pgs.length})},
   list:winners,prep:prep,draw:function(d){return certCanvas(d)},fonts:fontsReady};
+})();
+</script>
+
+<script>
+/* ===== 📥 Question import (Excel / CSV / TXT) ===== */
+(function(){
+ var NEED=35,PER=5;
+ function cv(v){ if(v==null) return ''; if(typeof v==='object'){ if(v.richText) return v.richText.map(function(x){return x.text}).join(''); if(v.text!=null) return String(v.text); if(v.result!=null) return String(v.result); if(v.hyperlink) return String(v.hyperlink); return ''; } return String(v); }
+ function clean(t){ return cv(t).replace(/[\r\n\t]+/g,' ').replace(/\s{2,}/g,' ').trim(); }
+ function csvRows(txt){ txt=txt.replace(/^﻿/,''); var first=txt.split(/\r?\n/)[0]||'', d=',', c={'\t':(first.match(/\t/g)||[]).length,';':(first.match(/;/g)||[]).length,',':(first.match(/,/g)||[]).length}; if(c['\t']>=c[','] && c['\t']>0) d='\t'; else if(c[';']>c[',']) d=';';
+  var rows=[],row=[],cur='',q=false,i,ch; for(i=0;i<txt.length;i++){ ch=txt[i]; if(q){ if(ch=='"'){ if(txt[i+1]=='"'){cur+='"';i++} else q=false } else cur+=ch } else if(ch=='"') q=true; else if(ch==d){ row.push(cur); cur=''; } else if(ch=='\n'||ch=='\r'){ if(ch=='\r'&&txt[i+1]=='\n') i++; row.push(cur); rows.push(row); row=[]; cur=''; } else cur+=ch; }
+  if(cur!==''||row.length){ row.push(cur); rows.push(row); } return rows; }
+ function toLines(rows){ var out=[],bad=0,skipped=0;
+  rows.forEach(function(r,ix){ var q=clean(r[0]),a=clean(r[1]),im=clean(r[2]),au=clean(r[3]);
+   if(!q&&!a) return;
+   if(ix===0 && /^(question|q\b|prashn|પ્રશ્ન|સવાલ)/i.test(q) && /^(answer|a\b|javab|જવાબ|ઉત્તર)/i.test(a)){ skipped=1; return; }
+   if(!q||!a){ bad++; return; }
+   q=q.replace(/::/g,':'); out.push(q+'::'+a+(im?' [img:'+im.replace(/\s+/g,'')+']':'')+(au?' [audio:'+au.replace(/\s+/g,'')+']':'')); });
+  return {lines:out,bad:bad}; }
+ function done(res,name){ var ta=document.getElementById('qaText'),st=document.getElementById('qaImpMsg'); if(!ta) return;
+  if(!res.lines.length){ if(st){st.style.color='#b91c1c';st.textContent='❌ '+name+' માંથી કોઈ Question મળ્યો નહિ. Column A = Question, Column B = Answer હોવું જોઈએ.'} return; }
+  var n=res.lines.length,w='',L=res.lines.slice(); if(PER&&n%PER===0&&n/PER<=12){ var o=[]; L.forEach(function(x,i){ if(i%PER===0) o.push('Round '+(i/PER+1)); o.push(x); }); L=o; } ta.value=L.join('\n');
+  var seen={},dup=0; res.lines.forEach(function(x){ var k=x.split('::')[1].replace(/ \[(img|audio):[^\]]*\]/g,'').trim().toLowerCase(); if(seen[k]) dup++; seen[k]=1; }); if(dup) w+=' ⚠ '+dup+' જવાબ બે વાર આવે છે (દરેક જવાબ અલગ રાખો).';
+  if(NEED&&n!==NEED) w=' ⚠ આ Game માટે '+NEED+' Questions જોઈએ (હાલ '+n+').';
+  if(res.bad) w+=' ('+res.bad+' ખાલી/અધૂરી લાઇન છોડી)';
+  if(st){st.style.color=w.indexOf('⚠')>=0?'#b45309':'#15803d';st.textContent='✅ '+n+' Questions લોડ થયા ('+name+').'+w+' નીચે Textbox માં ચકાસો, પછી Create Room.'} }
+ window.qaImport=function(inp){ var f=inp.files&&inp.files[0]; if(!f) return; var st=document.getElementById('qaImpMsg'); if(st){st.style.color='';st.textContent='⏳ વાંચી રહ્યા છીએ…'}
+  var ext=(f.name.split('.').pop()||'').toLowerCase();
+  if(ext==='xlsx'){ if(typeof ExcelJS==='undefined'){ if(st) st.textContent='❌ Excel library લોડ નથી થઈ (Internet તપાસો) — CSV વાપરો.'; return; }
+   f.arrayBuffer().then(function(buf){ var wb=new ExcelJS.Workbook(); return wb.xlsx.load(buf).then(function(){ var ws=wb.worksheets[0],rows=[]; if(ws) ws.eachRow({includeEmpty:false},function(row){ rows.push([row.getCell(1).value,row.getCell(2).value,row.getCell(3).value,row.getCell(4).value]); }); done(toLines(rows),f.name); }); }).catch(function(e){ if(st){st.style.color='#b91c1c';st.textContent='❌ Excel ખુલી નહિ: '+e.message} });
+  } else {
+   f.text().then(function(t){ if(/::/.test(t) && ext==='txt'){ var L=t.split(/\r?\n/).map(function(x){return x.trim()}).filter(Boolean); done({lines:L,bad:0},f.name); } else done(toLines(csvRows(t)),f.name); });
+  }
+  inp.value=''; };
+ window.qaTemplate=function(){ if(typeof ExcelJS==='undefined'){ alert('Excel library લોડ નથી થઈ.'); return; }
+  var wb=new ExcelJS.Workbook(),ws=wb.addWorksheet('Questions'); ws.columns=[{header:'Question',key:'q',width:60},{header:'Answer',key:'a',width:30},{header:'Image (વૈકલ્પિક)',key:'i',width:26},{header:'Audio (વૈકલ્પિક)',key:'u',width:26}];
+  [['ભારતની રાજધાની કઈ છે?','નવી દિલ્હી','',''],['ગુજરાતનું સૌથી મોટું શહેર કયું છે?','અમદાવાદ','q2.jpg',''],['આ ગીત કયું છે?','વૈષ્ણવ જન','','geet.mp3']].forEach(function(r){ ws.addRow({q:r[0],a:r[1],i:r[2],u:r[3]}); });
+  var h=ws.getRow(1); h.font={bold:true,color:{argb:'FFFFFFFF'}}; h.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF0F766E'}}; ws.views=[{state:'frozen',ySplit:1}];
+  wb.xlsx.writeBuffer().then(function(b){ var a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([b],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})); a.download='questions-template.xlsx'; document.body.appendChild(a); a.click(); a.remove(); }); };
 })();
 </script>
 </body>
