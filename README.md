@@ -1,3 +1,9 @@
+## 🎬 Update (Projector full control + Cards)
+- Projector (📺) parthi j start→end: Round pooro / Mystery Box (Beginning), Next Round, Result Reveal, Next Winner, 📊 Dashboard, 🎁 Scratch Card Reveal, ⬇ Excel.
+- Report Card ma 5×5 card (badhi games).
+- Winner/Thank-you card button → seedho download.
+Upload only: server.js, host.html, player.html
+
 ## 📺 Update (Projector sequence)
 - Lobby: 5:00 Join Timer (Projector par moto countdown, +1 minute / Timer bandh), pachhi "Game shuru karo".
 - Spin -> Wheel fare -> number -> Question + timer (30/45 sec) -> samay puro thaye Wheel pacho dekhay -> Host SPIN -> repeat.

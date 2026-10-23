@@ -1963,7 +1963,6 @@ async function wcDownload(k){
 async function wcShare(k){
   const b=await wcBlob(k); if(!b){ alert('આ category માં કોઈ Winner નથી.'); return; }
   const f=new File([b],'winner-'+k+'.png',{type:'image/png'});
-  if(navigator.canShare && navigator.canShare({files:[f]})){ try{ await navigator.share({files:[f],title:'જ્ઞાન શોધ Winner'}); return; }catch(e){ if(e&&e.name==='AbortError') return; } }
   wcDownload(k);
 }
 async function wcDownloadAll(){
@@ -1980,7 +1979,6 @@ function tyBlob(n){ return new Promise(res=>{ const d=tyData(n); if(!d) return r
 async function tyShare(n){
   const b=await tyBlob(n); if(!b) return;
   const f=new File([b],'thankyou-'+n.replace(/[^\w઀-૿]+/g,'_')+'.png',{type:'image/png'});
-  if(navigator.canShare && navigator.canShare({files:[f]})){ try{ await navigator.share({files:[f],title:'ધન્યવાદ'}); return; }catch(e){ if(e&&e.name==='AbortError') return; } }
   const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=f.name; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),5000);
 }
 async function tyDownloadAll(){
@@ -2345,10 +2343,12 @@ function pvAnnounce(r){var O=(typeof WINNER_ORDER!=='undefined')?WINNER_ORDER:[]
  function btn(a,t,c){return '<button data-act="'+a+'"'+(c?' class="'+c+'"':'')+'>'+t+'</button>'}
  function ctl(r){var st=r.status,b='';
   if(st==='lobby')b=(r.joinEnd?btn('jtp','＋1 મિનિટ')+btn('jtx','⏹ Timer બંધ','sk'):btn('jt5','⏱ 5:00 Join Timer શરૂ'))+btn('start','▶ Game શરૂ કરો','go');
-  else if(st==='active'||st==='locked')b=btn('spin','🎡 SPIN','go')+(st==='locked'?'':'')+btn('end','🏁 Game પૂરી','sk');
+  else if(st==='active'||st==='locked'){var per_=(r.cfg&&r.cfg.perRound)||5,rdU=(r.usedIdx||[]).filter(function(i){return Math.floor(i/per_)===(r.round||0)}).length;b=(st==='locked'&&rdU>=per_)?btn('startbox','🎁 Round '+((r.round||0)+1)+' પૂરો – Mystery Box શરૂ કરો','go'):btn('spin','🎡 SPIN','go');b+=btn('end','🏁 Game પૂરી','sk')}
   else if(st==='question')b=(r.paused?btn('resume','▶ Resume','go'):btn('pause','⏸ Pause'))+btn('skip','⏭ Time Skip','sk');
-  else if(st==='ended')b=btn('reveal','🏆 Result Reveal કરો','go');
-  else if(st==='revealed'){var O=(typeof WINNER_ORDER!=='undefined')?WINNER_ORDER:[];b=((r.revealStep||0)<=O.length)?btn('next','⏭ આગળ (Next Winner)','go'):''}
+  else if(st==='ended')b=btn('reveal','🏆 Result Reveal કરો','go')+btn('dash','📊 Dashboard','sk');
+  else if(st==='box'){var lastR=(r.round||0)>=(((r.cfg&&r.cfg.rounds)||7)-1);b=btn('nextround',lastR?'🏁 છેલ્લો Round પૂરો':'➡️ Next Round (નવું Wheel)','go')+btn('end','🏁 Game પૂરી','sk')}
+  else if(st==='opening')b=btn('reveal','🏆 Result Reveal શરૂ કરો','go');
+  else if(st==='revealed'){var O=(typeof WINNER_ORDER!=='undefined')?WINNER_ORDER:[];b=((r.revealStep||0)<=O.length)?btn('next','⏭ આગળ (Next Winner)','go'):'';if((r.revealStep||0)>O.length)b+=btn('dash','📊 Dashboard','go')+btn('sc',r.scReveal?'✅ Scratch Card Reveal થયું · 🔒 છુપાવો':'🎁 Scratch Card Reveal કરો','go')+btn('xls','⬇ Excel','sk')}
   return b?'<div class="pjbar">'+b+'</div>':''}
  function stage(r){var h='';try{if((!wheelLayout||!spinning)&&typeof computeLayout==='function')wheelLayout=computeLayout(r);
    h=(typeof drawStage==='function')?drawStage(r):wheelSVG(wheelLayout,wheelRotation,pendingReveal)}catch(e){h=''}
@@ -2361,7 +2361,10 @@ function pvAnnounce(r){var O=(typeof WINNER_ORDER!=='undefined')?WINNER_ORDER:[]
   return (o||tie)?'<div class="pjclaim">'+o+(tie?'<small>⚖️ Tie-break: '+esc2(tie===true?'સૌથી પહેલા Claim':tie)+'</small>':'')+'</div>':''}
  function html(r){var st=r.status;
   if(st==='active'||st==='spinning'||st==='revealing'||st==='locked'){
-   return '<div class="pjh">જ્ઞાન શોધ</div>'+(st==='locked'?'<div class="pjfire" style="background:linear-gradient(90deg,#475569,#1e293b);box-shadow:none;animation:none">⏱ સમય પૂરો — હવે Spin દબાવો</div>':'')+stage(r)+(st==='active'&&!(r.usedIdx||[]).length?'<div class="pjs">Game શરૂ થાય છે…</div>':'')+(st==='revealing'?'<div class="pjs">હવે પ્રશ્ન આવે છે…</div>':'')+bars(r)+ctl(r)}
+   return '<div class="pjh">જ્ઞાન શોધ</div>'+(r.round!=null?'<div class="pjs">ROUND '+((r.round||0)+1)+'</div>':'')+(st==='locked'?'<div class="pjfire" style="background:linear-gradient(90deg,#475569,#1e293b);box-shadow:none;animation:none">⏱ સમય પૂરો — '+(((r.usedIdx||[]).filter(function(i){var p_=(r.cfg&&r.cfg.perRound)||5;return Math.floor(i/p_)===(r.round||0)}).length>=((r.cfg&&r.cfg.perRound)||5))?'Round પૂરો, Mystery Box શરૂ કરો':'હવે Spin દબાવો')+'</div>':'')+stage(r)+(st==='active'&&!(r.usedIdx||[]).length?'<div class="pjs">Game શરૂ થાય છે…</div>':'')+(st==='revealing'?'<div class="pjs">હવે પ્રશ્ન આવે છે…</div>':'')+bars(r)+ctl(r)}
+  if(st==='box'){var pk=0,tp=Object.keys(r.players||{}),rm=Math.max(0,Math.ceil(((r.boxEnd||0)-Date.now())/1000));tp.forEach(function(n){if(((r.players[n].boxPick||[])[r.round])!=null)pk++});
+   return '<div class="pjh">જ્ઞાન શોધ</div><div class="pjs">ROUND '+((r.round||0)+1)+' પૂરો</div><div class="pjbig">🎁</div><div class="pjs">Mystery Box</div><div class="pjt'+(rm<=10&&!r.boxAuto?' lo':'')+'">'+(r.boxAuto?'⏱':rm+'s')+'</div><div class="pjs">✅ '+pk+' / '+tp.length+' Players એ Box પસંદ કર્યું</div>'+ctl(r)}
+  if(st==='opening')return '<div class="pjh">જ્ઞાન શોધ</div><div class="pjbig">🏁</div><div class="pjs">બધા Round પૂરા</div><div class="pjs">Mystery Box ના Result Players ને દેખાય છે</div>'+ctl(r)
   var h=html0(r);
   if(st==='question'){h=h.replace(/<div class="pjs">પ્રશ્ન \d+[^<]*<\/div>/,r.round!=null?'<div class="pjs">Round '+((r.round||0)+1)+'</div>':'')}
   if(st==='lobby'){h=h.replace('<div class="pjrow">','<div id="pjjw"></div><div class="pjrow">')}
@@ -2399,8 +2402,8 @@ function pvAnnounce(r){var O=(typeof WINNER_ORDER!=='undefined')?WINNER_ORDER:[]
   return head+'<div class="pjbig">🎁</div><div class="pjs">'+(r.round!=null?'Round '+((r.round||0)+1)+' · ':'')+'થોભો…</div>'}
  function paint(){paint0();var o=document.getElementById('pj'),r=(typeof state!=='undefined')&&state.room;if(open&&o&&r&&r.status==='lobby'){var w=o.querySelector('#pjjw');if(w)w.innerHTML=jtHTML(r)}}
  function paint0(){if(!open)return;if(typeof spinning!=="undefined"&&spinning)return;var r=(typeof state!=='undefined')&&state.room;var o=document.getElementById('pj');if(!o||!r)return;pvAnnounce(r);sfxTick(r);var h=html(r);var jw=o.querySelector('#pjjw');if(h!==last){last=h;o.querySelector('.pjin').innerHTML=h}}
- function toggle(on){open=(on===undefined)?!open:on;var o=document.getElementById('pj');o.style.display=open?'flex':'none';if(open){last='';paint();try{if(o.requestFullscreen)o.requestFullscreen()}catch(e){}iv=setInterval(paint,500)}else{clearInterval(iv);try{o.querySelector('.pjin').innerHTML='';last=''}catch(e){}try{if(document.fullscreenElement)document.exitFullscreen()}catch(e){}}}
- function init(){var o=document.createElement('div');o.id='pj';o.style.display='none';o.innerHTML='<button class="pjx" aria-label="Close">✕</button><button class="pjv" aria-label="Voice">🔊</button><div class="pjin"></div>';o.querySelector('.pjv').onclick=function(){PV.on=!PV.on;this.textContent=PV.on?'🔊':'🔇';try{speechSynthesis.cancel()}catch(e){}};document.body.insertBefore(o,document.body.firstChild);o.querySelector('.pjin').onclick=function(e){var t=e.target.closest&&e.target.closest('[data-act]');if(!t)return;var a=t.getAttribute('data-act'),f={start:'hostStart',spin:'hostSpin',pause:'hostPause',resume:'hostResume',skip:'hostSkipTimer',reveal:'hostReveal',next:'hostNextWinner',end:'hostEnd'}[a];if(a==='jt5'){socket.emit('host:joinTimer',{code:state.code,sec:300});return}if(a==='jtp'){var rr=state.room,rm=Math.max(0,Math.ceil(((rr&&rr.joinEnd||0)-Date.now())/1000));socket.emit('host:joinTimer',{code:state.code,sec:rm+60});return}if(a==='jtx'){socket.emit('host:joinTimer',{code:state.code,sec:0});return}try{if(f&&typeof window[f]==='function')window[f]();else if(f)eval(f+'()')}catch(x){}};o.querySelector('.pjx').onclick=function(){toggle(false)};
+ function toggle(on){open=(on===undefined)?!open:on;var o=document.getElementById('pj');o.style.display=open?'flex':'none';if(open){last='';paint();try{var de=document.documentElement;if(de.requestFullscreen)de.requestFullscreen()}catch(e){}iv=setInterval(paint,500)}else{clearInterval(iv);try{o.querySelector('.pjin').innerHTML='';last=''}catch(e){}try{if(document.fullscreenElement)document.exitFullscreen()}catch(e){}}}
+ function init(){var o=document.createElement('div');o.id='pj';o.style.display='none';o.innerHTML='<button class="pjx" aria-label="Close">✕</button><button class="pjv" aria-label="Voice">🔊</button><div class="pjin"></div>';o.querySelector('.pjv').onclick=function(){PV.on=!PV.on;this.textContent=PV.on?'🔊':'🔇';try{speechSynthesis.cancel()}catch(e){}};document.body.insertBefore(o,document.body.firstChild);o.querySelector('.pjin').onclick=function(e){var t=e.target.closest&&e.target.closest('[data-act]');if(!t)return;var a=t.getAttribute('data-act'),f={start:'hostStart',spin:'hostSpin',pause:'hostPause',resume:'hostResume',skip:'hostSkipTimer',reveal:'hostReveal',next:'hostNextWinner',end:'hostEnd',startbox:'hostStartBox',nextround:'hostNextRound',dash:'openDashboard',xls:'downloadExcel'}[a];if(a==='sc'){var r3=state.room;hostScReveal(!(r3&&r3.scReveal));return}if(a&&a.indexOf('draw_')===0){hostSetDraw(a.slice(5));return}if(a==='jt5'){socket.emit('host:joinTimer',{code:state.code,sec:300});return}if(a==='jtp'){var rr=state.room,rm=Math.max(0,Math.ceil(((rr&&rr.joinEnd||0)-Date.now())/1000));socket.emit('host:joinTimer',{code:state.code,sec:rm+60});return}if(a==='jtx'){socket.emit('host:joinTimer',{code:state.code,sec:0});return}try{if(f&&typeof window[f]==='function')window[f]();else if(f)eval(f+'()')}catch(x){}};o.querySelector('.pjx').onclick=function(){toggle(false)};
   var b=document.createElement('button');b.id='hproj';b.type='button';b.setAttribute('aria-label','Projector');b.textContent='📺';b.onclick=function(){toggle(true)};document.body.appendChild(b);
   document.addEventListener('keydown',function(e){if(e.key==='Escape'&&open)toggle(false)});document.addEventListener('fullscreenchange',function(){if(open&&!document.fullscreenElement){}})}
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
